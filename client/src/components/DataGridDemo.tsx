@@ -1,6 +1,7 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { API_URL } from "../env";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 90 },
@@ -97,7 +98,7 @@ export default function DataGridDemo() {
 
       try {
         const res = await axios.get(
-          `http://localhost:8000/products?page=${paginationModel.page}`,
+          `${API_URL}products?page=${paginationModel.page}`,
           { signal, withCredentials: true }
         );
         console.log(res.data);

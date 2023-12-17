@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { API_URL } from "../env";
 
 type DepartmentType = {
   id: number;
@@ -23,7 +24,7 @@ const DepartmentsList = () => {
       setStatus("loading");
 
       try {
-        const res = await axios.get(`http://localhost:8000/departments`, {
+        const res = await axios.get(API_URL + "departments", {
           signal,
           withCredentials: true,
         });
