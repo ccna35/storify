@@ -1,22 +1,9 @@
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import DataGridDemo from "../components/DataGridDemo";
-import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { UserContext } from "../hooks/UserContext";
 import DepartmentsList from "../components/DepartmentsList";
 
 export default function HomePage() {
-  const navigate = useNavigate();
-
-  const { user } = useContext(UserContext);
-
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [navigate, user]);
-
   return (
     <Box sx={{ minHeight: "100vh" }}>
       <Container maxWidth="lg" sx={{ marginInline: "auto" }}>

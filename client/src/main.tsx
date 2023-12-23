@@ -12,6 +12,9 @@ import HomePage from "./pages/HomePage.tsx";
 import Register from "./pages/Register.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import Login from "./pages/Login.tsx";
+import Profile from "./pages/Profile.tsx";
+import Settings from "./pages/Settings.tsx";
+import PrivateRoutes from "./layouts/PrivateRoutes.tsx";
 
 const router = createBrowserRouter([
   {
@@ -21,7 +24,27 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <HomePage />,
+        element: (
+          <PrivateRoutes>
+            <HomePage />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "/profile",
+        element: (
+          <PrivateRoutes>
+            <Profile />
+          </PrivateRoutes>
+        ),
+      },
+      {
+        path: "/settings",
+        element: (
+          <PrivateRoutes>
+            <Settings />
+          </PrivateRoutes>
+        ),
       },
       {
         path: "/register",

@@ -1,7 +1,9 @@
 import { Box, Stack, Typography } from "@mui/material";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { API_URL } from "../env";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../hooks/UserContext";
 
 type DepartmentType = {
   id: number;
@@ -10,6 +12,9 @@ type DepartmentType = {
 };
 
 const DepartmentsList = () => {
+  const navigate = useNavigate();
+  const { updateUserInfo } = useContext(UserContext);
+
   const [data, setData] = useState<[] | DepartmentType[]>([]);
   const [status, setStatus] = useState<
     "idle" | "loading" | "error" | "success"
@@ -28,12 +33,15 @@ const DepartmentsList = () => {
           signal,
           withCredentials: true,
         });
-        console.log(res.data);
         setStatus("success");
         setData(res.data);
       } catch (error) {
         console.log(error);
         setStatus("error");
+        if (error.response.status !== 200) {
+          updateUserInfo(null);
+          navigate("/login");
+        }
       }
     })();
 

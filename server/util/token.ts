@@ -13,7 +13,7 @@ const generateToken = async function (user_id: number) {
     },
     jwt_secret,
     {
-      expiresIn: "1d",
+      expiresIn: "30s",
     }
   );
 
