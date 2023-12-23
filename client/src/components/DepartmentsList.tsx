@@ -1,9 +1,8 @@
 import { Box, Stack, Typography } from "@mui/material";
-import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { API_URL } from "../env";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
+import { query } from "../config/config";
 
 type DepartmentType = {
   id: number;
@@ -29,9 +28,8 @@ const DepartmentsList = () => {
       setStatus("loading");
 
       try {
-        const res = await axios.get(API_URL + "departments", {
+        const res = await query.get(`departments`, {
           signal,
-          withCredentials: true,
         });
         setStatus("success");
         setData(res.data);
@@ -49,7 +47,7 @@ const DepartmentsList = () => {
       // Cancel the request when the component unmounts
       controller.abort();
     };
-  }, []);
+  }, [navigate, updateUserInfo]);
 
   return (
     <Box

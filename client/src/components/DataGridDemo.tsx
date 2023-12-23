@@ -1,9 +1,8 @@
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import axios from "axios";
 import { useContext, useEffect, useState } from "react";
-import { API_URL } from "../env";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
+import { query } from "../config/config";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 90 },
@@ -102,10 +101,15 @@ export default function DataGridDemo() {
       setStatus("loading");
 
       try {
-        const res = await axios.get(
-          `${API_URL}products?page=${paginationModel.page}`,
-          { signal, withCredentials: true }
-        );
+        // const res = await axios.get(
+        //   `${API_URL}products?page=${paginationModel.page}`,
+        //   { signal, withCredentials: true }
+        // );
+
+        const res = await query.get(`products?page=${paginationModel.page}`, {
+          signal,
+        });
+
         setStatus("success");
         setRows(res.data);
       } catch (error) {
@@ -122,7 +126,7 @@ export default function DataGridDemo() {
       // Cancel the request when the component unmounts
       controller.abort();
     };
-  }, [navigate, paginationModel.page]);
+  }, [navigate, paginationModel.page, updateUserInfo]);
 
   return (
     <DataGrid

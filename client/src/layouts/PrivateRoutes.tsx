@@ -1,19 +1,11 @@
-import { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { Navigate, Outlet } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
 
-const PrivateRoutes = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
-
+const PrivateRoutes = () => {
   const { user } = useContext(UserContext);
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/login");
-    }
-  }, [navigate, user]);
-
-  return <>{children}</>;
+  return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoutes;

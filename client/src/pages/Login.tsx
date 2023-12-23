@@ -11,7 +11,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { API_URL } from "../env";
 import { LoadingButton } from "@mui/lab";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
 
@@ -36,6 +36,17 @@ const Login = () => {
     }
   }, [navigate, user]);
 
+  // To help us abort the request when component unmounts
+  const controller = useMemo(() => new AbortController(), []);
+  const signal = controller.signal;
+
+  useEffect(() => {
+    return () => {
+      // Cancel the request when the component unmounts
+      controller.abort();
+    };
+  }, [controller]);
+
   const {
     register,
     handleSubmit,
@@ -49,6 +60,7 @@ const Login = () => {
     try {
       const res = await axios.post(API_URL + "users/login", data, {
         withCredentials: true,
+        signal,
       });
       console.log(res);
 

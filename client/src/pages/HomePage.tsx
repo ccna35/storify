@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import DataGridDemo from "../components/DataGridDemo";
 import DepartmentsList from "../components/DepartmentsList";
 
-export default function HomePage() {
+const HomePage = () => {
   return (
     <Box sx={{ minHeight: "100vh" }}>
       <Container maxWidth="lg" sx={{ marginInline: "auto" }}>
@@ -23,4 +23,6 @@ export default function HomePage() {
       </Container>
     </Box>
   );
-}
+};
+
+export default HomePage;

@@ -23,6 +23,24 @@ import Logout from "@mui/icons-material/Logout";
 import Settings from "@mui/icons-material/Settings";
 import PersonAdd from "@mui/icons-material/PersonAdd";
 
+const NAV_MENU_ITEMS = [
+  {
+    id: 1,
+    name: "Home",
+    path: "/",
+  },
+  {
+    id: 2,
+    name: "Profile",
+    path: "/profile",
+  },
+  {
+    id: 3,
+    name: "Settings",
+    path: "/settings",
+  },
+];
+
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -62,30 +80,27 @@ export default function Navbar() {
             <Stack direction="row" spacing={2} alignItems="center">
               {user !== null && (
                 <Stack direction="row" spacing={4} alignItems="center">
-                  <Link
-                    component={NavLink}
-                    to="/"
-                    color="#fff"
-                    sx={{ textDecoration: "none" }}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    component={NavLink}
-                    to="/profile"
-                    color="#fff"
-                    sx={{ textDecoration: "none" }}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    component={NavLink}
-                    to="/settings"
-                    color="#fff"
-                    sx={{ textDecoration: "none" }}
-                  >
-                    Settings
-                  </Link>
+                  {NAV_MENU_ITEMS.map(({ id, name, path }) => {
+                    return (
+                      <Link
+                        key={id}
+                        component={NavLink}
+                        to={path}
+                        color="#fff"
+                        sx={{
+                          textDecoration: "none",
+                          padding: "2px 6px",
+                          borderRadius: "4px",
+                          "&.active": {
+                            border: "1px solid white",
+                          },
+                        }}
+                      >
+                        {name}
+                      </Link>
+                    );
+                  })}
+
                   <Fragment>
                     <Tooltip title="Account settings">
                       <IconButton
