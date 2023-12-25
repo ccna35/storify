@@ -26,17 +26,21 @@ import { Suspense } from "react";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path="/" element={<RootLayout />} errorElement={<ErrorPage />}>
-      <Route element={<PrivateRoutes />}>
-        {PRIVATE_ROUTES.map((route) => (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={
-              <Suspense fallback={<SpinnerOfDoom />}>{route.element}</Suspense>
-            }
-          />
-        ))}
+    <>
+      <Route path="/" element={<RootLayout />} errorElement={<ErrorPage />}>
+        <Route element={<PrivateRoutes />}>
+          {PRIVATE_ROUTES.map((route) => (
+            <Route
+              key={route.path}
+              path={route.path}
+              element={
+                <Suspense fallback={<SpinnerOfDoom />}>
+                  {route.element}
+                </Suspense>
+              }
+            />
+          ))}
+        </Route>
       </Route>
       <Route element={<AuthRoutes />}>
         <Route path="/login" element={<Login />} />
@@ -49,7 +53,7 @@ const router = createBrowserRouter(
           }
         />
       </Route>
-    </Route>
+    </>
   )
 );
 

@@ -1,27 +1,49 @@
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import DataGridDemo from "../components/DataGridDemo";
-import DepartmentsList from "../components/DepartmentsList";
+import { Box, Stack } from "@mui/material";
+import Stats from "../components/Pages/HomePage/Stats/Stats";
+import Preview from "../components/Pages/HomePage/Previews/Preview";
+import CustomerPreview from "../components/Pages/HomePage/Previews/Customer Preview/CustomerPreview";
+import RecentInvoices from "../components/Pages/HomePage/Recents/RecentInvoices";
 
 const HomePage = () => {
   return (
-    <Box sx={{ minHeight: "100vh" }}>
-      <Container maxWidth="lg" sx={{ marginInline: "auto" }}>
+    <Stack direction="column" spacing={4}>
+      <Stats />
+      <Box
+        sx={{
+          display: "grid",
+          columnGap: 2,
+          gridTemplateColumns: "repeat(4, 1fr)",
+        }}
+      >
         <Box
-          display="grid"
-          gridTemplateColumns="1fr 1fr 1fr 1fr"
-          gap={4}
-          sx={{ width: "100%", py: 3 }}
+          sx={{
+            boxShadow: "0px 5px 15px -3px rgba(0,0,0,0.1)",
+            border: "1px solid #e9ecef",
+            py: 4,
+            px: 3,
+            gridColumn: "span 3",
+          }}
+          flexGrow={1}
         >
-          <Box gridColumn="span 1">
-            <DepartmentsList />
-          </Box>
-          <Box gridColumn="span 3">
-            <DataGridDemo />
-          </Box>
+          <Stack direction="row" gap={3} justifyContent="space-between">
+            <Preview />
+            <Preview />
+            <Preview />
+          </Stack>
         </Box>
-      </Container>
-    </Box>
+        <CustomerPreview />
+      </Box>
+      <Box
+        sx={{
+          display: "grid",
+          columnGap: 2,
+          gridTemplateColumns: "repeat(2, 1fr)",
+        }}
+      >
+        <RecentInvoices />
+        <RecentInvoices />
+      </Box>
+    </Stack>
   );
 };
 

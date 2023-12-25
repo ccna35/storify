@@ -1,4 +1,5 @@
 import { HomePage, Profile, Settings } from "./pages";
+import Products from "./pages/Products";
 
 export const PRIVATE_ROUTES = [
   {
@@ -12,6 +13,10 @@ export const PRIVATE_ROUTES = [
   {
     path: "/settings",
     element: <Settings />,
+  },
+  {
+    path: "/products",
+    element: <Products />,
   },
 ];
 
