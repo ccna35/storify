@@ -1,14 +1,35 @@
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 
 const SpinnerOfDoom = () => {
   return (
     <Box
-      width="100vw"
-      height="100vh"
-      display="grid"
-      sx={{ placeItems: "center" }}
+      // height="10rem"
+      sx={{ width: "100%" }}
     >
-      <Box width={5} height={5} bgcolor="color.primary"></Box>
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
+      <Skeleton animation="wave" />
     </Box>
   );
 };

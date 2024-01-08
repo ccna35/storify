@@ -9,9 +9,10 @@ import { LoadingButton } from "@mui/lab";
 
 const SidebarMenuItems = [
   { id: 1, name: "Dashboard", path: "/" },
-  { id: 2, name: "Products", path: "/products" },
-  { id: 3, name: "Profile", path: "/profile" },
-  { id: 4, name: "Settings", path: "/settings" },
+  { id: 2, name: "Add Product", path: "/new-product" },
+  { id: 3, name: "Products", path: "/products" },
+  { id: 4, name: "Profile", path: "/profile" },
+  { id: 5, name: "Settings", path: "/settings" },
 ];
 
 const Sidebar = () => {

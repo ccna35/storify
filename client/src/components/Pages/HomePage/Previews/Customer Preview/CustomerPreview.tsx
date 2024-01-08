@@ -10,6 +10,7 @@ const CustomerPreview = () => {
         py: 4,
         px: 3,
         gridColumn: "span 1",
+        borderRadius: (theme) => theme.borderRadius.primary,
       }}
     >
       <Typography

@@ -2,7 +2,6 @@ import { Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar/Navbar";
 import { UserProvider } from "../hooks/UserContext";
 import { Box, Container } from "@mui/material";
-import DepartmentsList from "../components/DepartmentsList";
 import Sidebar from "../components/Sidebar/Sidebar";
 
 const RootLayout = () => {

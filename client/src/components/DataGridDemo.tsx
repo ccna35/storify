@@ -3,9 +3,12 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
 import { query } from "../config/config";
+import { useQuery } from "@tanstack/react-query";
+import { ProductService } from "../api";
+import SpinnerOfDoom from "./Spinners/SpinnerOfDoom";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 90 },
+  { field: "product_id", headerName: "ID", width: 90 },
   {
     field: "product_name",
     headerName: "Product Name",
@@ -31,8 +34,8 @@ const columns: GridColDef[] = [
     editable: true,
   },
   {
-    field: "brand",
-    headerName: "Brand",
+    field: "manufacturer",
+    headerName: "Manufacturer",
     width: 110,
     editable: true,
   },
@@ -63,9 +66,9 @@ const columns: GridColDef[] = [
   },
 ];
 
-type RowType = {
-  id: number;
-  brand: string;
+export type RowType = {
+  product_id: number;
+  manufacturer: string;
   category: string;
   created_at: string;
   updated_at: string;
@@ -80,53 +83,68 @@ export default function DataGridDemo() {
   const navigate = useNavigate();
   const { updateUserInfo } = useContext(UserContext);
 
-  const [rows, setRows] = useState<[] | RowType[]>([]);
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "error" | "success"
-  >("idle");
-
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 100,
   });
 
-  useEffect(() => {
-    if (paginationModel.page > 100) return;
+  const {
+    data: rows,
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: () => ProductService.getProducts(paginationModel.page),
+  });
 
-    // To help us abort the request when component unmounts
-    const controller = new AbortController();
-    const signal = controller.signal;
+  if (isSuccess) {
+    console.log(rows);
+  }
+  if (isError) {
+    console.log(error);
+    updateUserInfo(null);
+    navigate("/login");
+  }
 
-    (async () => {
-      setStatus("loading");
+  // useEffect(() => {
+  //   if (paginationModel.page > 100) return;
 
-      try {
-        // const res = await axios.get(
-        //   `${API_URL}products?page=${paginationModel.page}`,
-        //   { signal, withCredentials: true }
-        // );
+  //   // To help us abort the request when component unmounts
+  //   const controller = new AbortController();
+  //   const signal = controller.signal;
 
-        const res = await query.get(`products?page=${paginationModel.page}`, {
-          signal,
-        });
+  //   (async () => {
+  //     setStatus("loading");
 
-        setStatus("success");
-        setRows(res.data);
-      } catch (error) {
-        console.log(error);
-        setStatus("error");
-        if (error.response.status !== 200) {
-          updateUserInfo(null);
-          navigate("/login");
-        }
-      }
-    })();
+  //     try {
+  //       const res = await query.get(`products?page=${paginationModel.page}`, {
+  //         signal,
+  //       });
 
-    return () => {
-      // Cancel the request when the component unmounts
-      controller.abort();
-    };
-  }, [navigate, paginationModel.page, updateUserInfo]);
+  //       setStatus("success");
+  //       setRows(res.data);
+  //     } catch (error) {
+  //       console.log(error);  //       setStatus("error");
+  //       if (error.response.status !== 200) {
+  //         updateUserInfo(null);
+  //         navigate("/login");
+  //       }
+  //     }
+  //   })();
+
+  //   return () => {
+  //     // Cancel the request when the component unmounts
+  //     controller.abort();
+  //   };
+  // }, [navigate, paginationModel.page, updateUserInfo]);
+
+  // return <h1>hello</h1>;
+
+  if (isLoading) {
+    return <SpinnerOfDoom />;
+  }
 
   return (
     <DataGrid
@@ -134,7 +152,7 @@ export default function DataGridDemo() {
       pagination
       rows={rows}
       columns={columns}
-      loading={status === "loading"}
+      loading={isLoading}
       disableRowSelectionOnClick
       paginationModel={paginationModel}
       paginationMode="server"

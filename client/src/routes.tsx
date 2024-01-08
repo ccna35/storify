@@ -1,4 +1,5 @@
 import { HomePage, Profile, Settings } from "./pages";
+import NewProduct from "./pages/NewProduct";
 import Products from "./pages/Products";
 
 export const PRIVATE_ROUTES = [
@@ -17,6 +18,10 @@ export const PRIVATE_ROUTES = [
   {
     path: "/products",
     element: <Products />,
+  },
+  {
+    path: "/new-product",
+    element: <NewProduct />,
   },
 ];
 

@@ -22,6 +22,7 @@ const HomePage = () => {
             py: 4,
             px: 3,
             gridColumn: "span 3",
+            borderRadius: (theme) => theme.borderRadius.primary,
           }}
           flexGrow={1}
         >
