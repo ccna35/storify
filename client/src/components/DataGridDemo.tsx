@@ -1,14 +1,39 @@
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useContext, useEffect, useState } from "react";
+import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
-import { query } from "../config/config";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProductService } from "../api";
 import SpinnerOfDoom from "./Spinners/SpinnerOfDoom";
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  LinearProgress,
+  Snackbar,
+  SnackbarOrigin,
+  Stack,
+  Typography,
+  linearProgressClasses,
+  styled,
+} from "@mui/material";
+import { Cancel, Check } from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
+
+const BorderLinearProgress = styled(LinearProgress)(() => ({
+  height: 10,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    borderRadius: 5,
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+  },
+}));
 
 const columns: GridColDef[] = [
-  { field: "product_id", headerName: "ID", width: 90 },
+  { field: "id", headerName: "ID", width: 90 },
   {
     field: "product_name",
     headerName: "Product Name",
@@ -32,6 +57,9 @@ const columns: GridColDef[] = [
     headerName: "Category",
     width: 110,
     editable: true,
+    renderCell: ({ value }) => {
+      return <Chip label={value} variant="filled" />;
+    },
   },
   {
     field: "manufacturer",
@@ -50,19 +78,69 @@ const columns: GridColDef[] = [
     headerName: "Is Featured?",
     width: 110,
     editable: true,
+    renderCell: ({ value }) => {
+      return value === 1 ? (
+        <Check color="success" />
+      ) : (
+        <Cancel color="warning" />
+      );
+    },
   },
   {
     field: "stock_quantity",
-    headerName: "Quantity",
+    headerName: "Stock",
     type: "number",
     width: 110,
     editable: true,
+    renderCell: ({ value }) => {
+      return (
+        <Stack sx={{ width: "100%" }} spacing={1}>
+          <BorderLinearProgress
+            variant="determinate"
+            value={value}
+            color={
+              value < 10
+                ? "error"
+                : value >= 10 && value < 50
+                ? "warning"
+                : value >= 50 && value < 75
+                ? "info"
+                : "success"
+            }
+          />
+          {value === 0 ? (
+            <Typography textAlign={"center"}>Out of stock</Typography>
+          ) : (
+            <Typography
+              textAlign={"center"}
+              variant="caption"
+              component={"span"}
+            >
+              {value} in stock
+            </Typography>
+          )}
+        </Stack>
+      );
+    },
   },
   {
     field: "updated_at",
     headerName: "Updated At",
     width: 110,
     editable: true,
+  },
+  {
+    field: "id",
+    headerName: "",
+    width: 110,
+    editable: true,
+    renderCell: ({ value }) => {
+      return (
+        <LoadingButtonButton onClick={() => handleProductDeletion()}>
+          Delete
+        </LoadingButtonButton>
+      );
+    },
   },
 ];
 
@@ -79,9 +157,45 @@ export type RowType = {
   is_featured: number;
 };
 
+interface State extends SnackbarOrigin {
+  open: boolean;
+}
+
 export default function DataGridDemo() {
+  const queryClient = useQueryClient();
+
   const navigate = useNavigate();
   const { updateUserInfo } = useContext(UserContext);
+
+  const [state, setState] = useState<State>({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+  });
+  const { vertical, horizontal, open } = state;
+
+  const showSuccessMessage = () => {
+    setState({ ...state, open: true });
+  };
+
+  const handleClose = () => {
+    setState({ ...state, open: false });
+  };
+
+  const { mutateAsync: deleteProduct } = useMutation({
+    mutationFn: ProductService.deleteProduct,
+    onSuccess: () => {
+      showSuccessMessage();
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const handleProductDeletion = (id: number) => {
+    deleteProduct(id);
+  };
 
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -108,55 +222,40 @@ export default function DataGridDemo() {
     navigate("/login");
   }
 
-  // useEffect(() => {
-  //   if (paginationModel.page > 100) return;
-
-  //   // To help us abort the request when component unmounts
-  //   const controller = new AbortController();
-  //   const signal = controller.signal;
-
-  //   (async () => {
-  //     setStatus("loading");
-
-  //     try {
-  //       const res = await query.get(`products?page=${paginationModel.page}`, {
-  //         signal,
-  //       });
-
-  //       setStatus("success");
-  //       setRows(res.data);
-  //     } catch (error) {
-  //       console.log(error);  //       setStatus("error");
-  //       if (error.response.status !== 200) {
-  //         updateUserInfo(null);
-  //         navigate("/login");
-  //       }
-  //     }
-  //   })();
-
-  //   return () => {
-  //     // Cancel the request when the component unmounts
-  //     controller.abort();
-  //   };
-  // }, [navigate, paginationModel.page, updateUserInfo]);
-
-  // return <h1>hello</h1>;
-
   if (isLoading) {
     return <SpinnerOfDoom />;
   }
 
   return (
-    <DataGrid
-      rowCount={10000}
-      pagination
-      rows={rows}
-      columns={columns}
-      loading={isLoading}
-      disableRowSelectionOnClick
-      paginationModel={paginationModel}
-      paginationMode="server"
-      onPaginationModelChange={setPaginationModel}
-    />
+    <>
+      <DataGrid
+        slots={{ toolbar: GridToolbar }}
+        rowCount={10000}
+        pagination
+        rows={rows}
+        columns={columns}
+        loading={isLoading}
+        disableRowSelectionOnClick
+        paginationModel={paginationModel}
+        paginationMode="server"
+        onPaginationModelChange={setPaginationModel}
+        sx={{
+          "& .MuiDataGrid-filterForm": {
+            borderRadius: 10,
+          },
+        }}
+      />
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={open}
+        onClose={handleClose}
+        key={vertical + horizontal}
+        autoHideDuration={2000}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          Product deleted successfully!
+        </Alert>
+      </Snackbar>
+    </>
   );
 }

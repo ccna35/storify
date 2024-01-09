@@ -10,7 +10,7 @@ const RootLayout = () => {
       <Navbar />
 
       <Box sx={{ minHeight: "100vh" }}>
-        <Container maxWidth="lg" sx={{ marginInline: "auto" }}>
+        <Container maxWidth="xl" sx={{ marginInline: "auto" }}>
           <Box
             display="grid"
             gridTemplateColumns="1fr 1fr 1fr 1fr"

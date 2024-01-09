@@ -1,6 +1,7 @@
 import {
   Alert,
   Box,
+  Button,
   Checkbox,
   Container,
   Snackbar,
@@ -49,7 +50,7 @@ const NewProduct = () => {
   });
   const { vertical, horizontal, open } = state;
 
-  const showSuccessMessage = () => () => {
+  const showSuccessMessage = () => {
     setState({ ...state, open: true });
   };
 
@@ -230,9 +231,9 @@ const NewProduct = () => {
       <Snackbar
         anchorOrigin={{ vertical, horizontal }}
         open={open}
-        // onClose={handleClose}
-        // message="I love snacks"
+        onClose={handleClose}
         key={vertical + horizontal}
+        autoHideDuration={2000}
       >
         <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
           Product added successfully!

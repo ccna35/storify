@@ -21,4 +21,59 @@ const getAllProducts = async (req: Request, res: Response) => {
   }
 };
 
-export { getAllProducts };
+const createProduct = async (req: Request, res: Response) => {
+  const {
+    product_name,
+    description,
+    price,
+    stock_quantity,
+    manufacturer,
+    category,
+    is_featured,
+  } = req.body;
+
+  const product_details = [
+    [
+      product_name,
+      description,
+      price,
+      stock_quantity,
+      manufacturer,
+      category,
+      is_featured,
+    ],
+  ];
+
+  try {
+    // Insert a new product
+    const newProductQuery =
+      "INSERT INTO products(product_name, description, price, stock_quantity, manufacturer, category, is_featured) VALUES ?";
+    await pool.query<ResultSetHeader>(newProductQuery, [product_details]);
+
+    return res
+      .status(201)
+      .json({ message: "Product was created successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Internal Server Error");
+  }
+};
+
+const deleteProduct = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    // Delete a product
+    const query = "DELETE FROM products WHERE id = ?";
+    await pool.query<ResultSetHeader>(query, [id]);
+
+    return res
+      .status(201)
+      .json({ message: "Product was deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Internal Server Error");
+  }
+};
+
+export { getAllProducts, createProduct, deleteProduct };

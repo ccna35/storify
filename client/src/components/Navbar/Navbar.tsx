@@ -11,7 +11,7 @@ export default function Navbar() {
     <Box>
       <AppBar position="static" sx={{ boxShadow: "none", py: 1 }}>
         <Container
-          maxWidth="lg"
+          maxWidth="xl"
           sx={{
             marginInline: "auto",
             display: "flex",

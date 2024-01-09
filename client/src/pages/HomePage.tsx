@@ -1,13 +1,20 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import Stats from "../components/Pages/HomePage/Stats/Stats";
 import Preview from "../components/Pages/HomePage/Previews/Preview";
 import CustomerPreview from "../components/Pages/HomePage/Previews/Customer Preview/CustomerPreview";
 import RecentInvoices from "../components/Pages/HomePage/Recents/RecentInvoices";
+import Cards from "../components/Pages/HomePage/Cards/Cards";
+import Formatting from "../components/Pages/HomePage/Charts/LineChart";
 
 const HomePage = () => {
   return (
     <Stack direction="column" spacing={4}>
-      <Stats />
+      <Typography variant="h5" component={"h1"} fontWeight={500}>
+        Hi, Welcome back 👋
+      </Typography>
+      <Cards />
+      <Formatting />
+      {/* <Stats /> */}
       <Box
         sx={{
           display: "grid",

@@ -35,7 +35,20 @@ const createProduct = async (data: ProductFormValues) => {
   }
 };
 
+const deleteProduct = async (id: number) => {
+  try {
+    const res = await query.delete(`/${id}`);
+
+    console.log(res.data);
+
+    return res.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const ProductService = {
   getProducts,
   createProduct,
+  deleteProduct,
 };
