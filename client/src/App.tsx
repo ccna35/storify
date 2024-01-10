@@ -96,6 +96,20 @@ const App = () => {
         main: red.A400,
       },
     },
+    components: {
+      MuiButton: {
+        defaultProps: {
+          disableElevation: true,
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: 10,
+          },
+        },
+      },
+    },
   });
 
   const queryClient = new QueryClient({

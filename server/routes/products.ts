@@ -3,6 +3,8 @@ import {
   createProduct,
   deleteProduct,
   getAllProducts,
+  getOneProduct,
+  updateProduct,
 } from "../controllers/products";
 import { verifyToken } from "../util/token";
 
@@ -19,5 +21,11 @@ router.get("/", getAllProducts);
 
 // Delete a product
 router.delete("/:id", deleteProduct);
+
+// Get one product
+router.get("/:id", getOneProduct);
+
+// Update a product
+router.put("/:id", updateProduct);
 
 export default router;

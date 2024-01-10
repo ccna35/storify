@@ -17,6 +17,7 @@ import { ProductService } from "../api";
 import { useState } from "react";
 
 export type ProductFormValues = {
+  id?: number;
   product_name: string;
   description: string;
   price?: number;
@@ -92,7 +93,6 @@ const NewProduct = () => {
             spacing={2}
             sx={{ maxWidth: "500px", marginInline: "auto" }}
           >
-            {/* {errorMsg && <Alert severity="error">{errorMsg}</Alert>} */}
             <Stack direction="column" spacing={1}>
               <TextField
                 label="Product name"

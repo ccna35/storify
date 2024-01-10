@@ -13,12 +13,6 @@ interface IUserContext {
   updateUserInfo: (data: UserType | null) => void;
 }
 
-// console.log(
-//   localStorage.getItem("user")
-//     ? JSON.parse(localStorage.getItem("user") as string)
-//     : null
-// );
-
 const UserContext = createContext<IUserContext>({
   user: null,
   updateUserInfo: () => {},
