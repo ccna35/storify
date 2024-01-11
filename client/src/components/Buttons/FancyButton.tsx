@@ -8,6 +8,9 @@ const FancyButton = () => {
       disableFocusRipple
       disableRipple
       color="secondary"
+      sx={{
+        border: (theme) => `2px solid ${theme.palette.primary}`,
+      }}
     >
       Fancy Button
     </Button>
