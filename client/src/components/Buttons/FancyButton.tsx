@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 const FancyButton = () => {
   return (
     <Button
-      variant="contained"
+      variant="outlined"
       disableElevation
       disableFocusRipple
       disableRipple
