@@ -1,11 +1,11 @@
 import React, { createContext, useState } from "react";
 
 type UserType = {
-  id: number;
+  id?: number;
   first_name: string;
   last_name: string;
   email: string;
-  added: string;
+  added?: string;
 };
 
 interface IUserContext {

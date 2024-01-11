@@ -1,4 +1,14 @@
-import { Box, Button, Link, Stack } from "@mui/material";
+import {
+  Box,
+  Button,
+  Link,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  ListSubheader,
+  Stack,
+} from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useContext, useState } from "react";
@@ -6,14 +16,112 @@ import { UserContext } from "../../hooks/UserContext";
 import axios from "axios";
 import { API_URL } from "../../env";
 import { LoadingButton } from "@mui/lab";
+import Collapse from "@mui/material/Collapse";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import DraftsIcon from "@mui/icons-material/Drafts";
+import SendIcon from "@mui/icons-material/Send";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import StarBorder from "@mui/icons-material/StarBorder";
 
-const SidebarMenuItems = [
+type MenuItemType = {
+  id: number;
+  name: string;
+  path?: string;
+  subMenu?: { id: number; name: string; path: string }[];
+};
+
+type SidebarMenuItemsType = MenuItemType[];
+
+const SidebarMenuItems: SidebarMenuItemsType = [
   { id: 1, name: "Dashboard", path: "/" },
-  { id: 2, name: "Add Product", path: "/new-product" },
-  { id: 3, name: "Products", path: "/products" },
-  { id: 4, name: "Profile", path: "/profile" },
-  { id: 5, name: "Settings", path: "/settings" },
+  {
+    id: 2,
+    name: "Products",
+    subMenu: [
+      { id: 3, name: "Product List", path: "/products" },
+      { id: 4, name: "Add Product", path: "/new-product" },
+    ],
+  },
+  { id: 5, name: "Profile", path: "/profile" },
+  { id: 6, name: "Settings", path: "/settings" },
 ];
+
+type MenuItemProps = (typeof SidebarMenuItems)[number];
+
+const MenuItem = ({ name, path, subMenu }: MenuItemProps) => {
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    if (!subMenu) return;
+    setOpen(!open);
+  };
+
+  const MenuItemButton = () => (
+    <ListItemButton
+      onClick={handleClick}
+      sx={{
+        borderRadius: 2,
+      }}
+    >
+      <ListItemIcon>
+        <InboxIcon />
+      </ListItemIcon>
+      <ListItemText primary={name} />
+      {subMenu && (open ? <ExpandLess /> : <ExpandMore />)}
+    </ListItemButton>
+  );
+
+  return (
+    <>
+      {path ? (
+        <Link
+          component={NavLink}
+          to={path}
+          sx={{
+            textDecoration: "none",
+            "&.active .MuiButtonBase-root": {
+              background: "#e9ecef",
+            },
+          }}
+        >
+          <MenuItemButton />
+        </Link>
+      ) : (
+        <MenuItemButton />
+      )}
+
+      {subMenu && (
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {subMenu.map(({ id, name, path }) => {
+              return (
+                <Link
+                  key={id}
+                  component={NavLink}
+                  to={path}
+                  sx={{
+                    textDecoration: "none",
+                    "&.active .MuiButtonBase-root": {
+                      background: "#e9ecef",
+                    },
+                  }}
+                >
+                  <ListItemButton key={id} sx={{ pl: 4, borderRadius: 2 }}>
+                    <ListItemIcon>
+                      <StarBorder />
+                    </ListItemIcon>
+                    <ListItemText primary={name} />
+                  </ListItemButton>
+                </Link>
+              );
+            })}
+          </List>
+        </Collapse>
+      )}
+    </>
+  );
+};
 
 const Sidebar = () => {
   const { user, updateUserInfo } = useContext(UserContext);
@@ -34,40 +142,33 @@ const Sidebar = () => {
       setStatus("error");
     }
   };
+
   return (
-    <Stack direction="column" spacing={4}>
-      <Box
+    <Stack spacing={2}>
+      <List
         sx={{
+          width: "100%",
+          maxWidth: 360,
+          bgcolor: "background.paper",
           border: "1px solid lightgray",
           borderRadius: 2,
+          padding: "5px",
         }}
+        component="nav"
+        aria-labelledby="nested-list-subheader"
       >
-        <Stack direction="column">
-          {SidebarMenuItems.map(({ id, name, path }) => {
-            return (
-              <Link
-                key={id}
-                component={NavLink}
-                to={path}
-                sx={{
-                  p: 2,
-                  textDecoration: "none",
-                  transition: "background-color 500ms",
-                  fontWeight: 500,
-                  "&:hover": {
-                    backgroundColor: "#f8f9fa",
-                  },
-                  "&.active": {
-                    backgroundColor: "#800f2f1a",
-                  },
-                }}
-              >
-                {name}
-              </Link>
-            );
-          })}
-        </Stack>
-      </Box>
+        {SidebarMenuItems.map(({ id, name, path, subMenu }) => {
+          return (
+            <MenuItem
+              key={id}
+              id={id}
+              name={name}
+              path={path}
+              subMenu={subMenu}
+            />
+          );
+        })}
+      </List>
       <LoadingButton
         loading={status === "loading"}
         loadingPosition="start"

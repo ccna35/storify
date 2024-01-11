@@ -20,11 +20,11 @@ export type ProductFormValues = {
   id?: number;
   product_name: string;
   description: string;
-  price?: number;
-  stock_quantity?: number;
+  price: number;
+  stock_quantity: number;
   manufacturer: string;
   category: string;
-  is_featured?: boolean;
+  is_featured: boolean;
 };
 
 const INITIAL_VALUES: ProductFormValues = {
@@ -141,10 +141,8 @@ const NewProduct = () => {
                   max: 1_000_000,
                   validate: {
                     isValid: (value) => {
-                      return (
-                        (value && value <= 1_000_000) ||
-                        "Price can't be more than $1,000,000"
-                      );
+                      const errorMsg = "Price can't be more than $1,000,000";
+                      return value < 1_000_000 || errorMsg;
                     },
                   },
                 })}
@@ -161,10 +159,9 @@ const NewProduct = () => {
                   max: 10_000,
                   validate: {
                     isValid: (value) => {
-                      return (
-                        (value && value <= 10_000) ||
-                        "Stock quantity can't be more than 10,000"
-                      );
+                      const errorMsg =
+                        "Stock quantity can't be more than 10,000";
+                      return value < 10_000 || errorMsg;
                     },
                   },
                 })}

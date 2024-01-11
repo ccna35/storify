@@ -32,11 +32,11 @@ type EditProductModalProps = {
 type ProductFormValues = {
   product_name: string;
   description: string;
-  price?: number;
-  stock_quantity?: number;
+  price: number;
+  stock_quantity: number;
   manufacturer: string;
   category: string;
-  is_featured?: boolean;
+  is_featured: boolean;
 };
 
 const INITIAL_VALUES: ProductFormValues = {
@@ -58,6 +58,8 @@ export default function EditProductModal({
   handleClose,
   product_id,
 }: EditProductModalProps) {
+  console.log(product_id);
+
   const queryClient = useQueryClient();
 
   const navigate = useNavigate();
@@ -82,7 +84,7 @@ export default function EditProductModal({
   console.log(product_id);
 
   const { data, isLoading, isSuccess, isError, error } = useQuery({
-    queryKey: ["product"],
+    queryKey: ["product", { product_id }],
     queryFn: () => ProductService.getOneProduct(product_id as number),
   });
 
@@ -114,7 +116,11 @@ export default function EditProductModal({
     handleSubmit,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    // defaultValues: INITIAL_VALUES,
+    defaultValues: {
+      price: 0,
+      stock_quantity: 0,
+      is_featured: false,
+    },
     mode: "onChange",
   });
 
@@ -128,9 +134,8 @@ export default function EditProductModal({
       <Dialog open={open} onClose={handleClose} fullWidth>
         <DialogTitle>Update</DialogTitle>
         <DialogContent>
-          {!data ? (
-            <Typography>Loading...</Typography>
-          ) : (
+          {isLoading && <Typography>Loading...</Typography>}
+          {!isLoading && data && (
             <form onSubmit={handleSubmit(onSubmit)} noValidate>
               <Stack direction="column" spacing={2} py={2}>
                 <Stack direction="column" spacing={1}>

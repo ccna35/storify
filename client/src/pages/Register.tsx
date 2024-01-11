@@ -85,11 +85,16 @@ const Register = () => {
     onSuccess: (data) => {
       console.log(data);
 
-      // updateUserInfo(res.data.user);
+      //  Update user state with new data
+      const { user_email: email, first_name, last_name, added, id } = data.user;
+      updateUserInfo({ first_name, last_name, added, email, id });
+      localStorage.setItem("user", JSON.stringify(data.user));
+      navigate("/");
+      showSuccessMessage();
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (error) => {
-      // console.log(error);
+      console.log(error);
     },
   });
 
@@ -141,8 +146,30 @@ const Register = () => {
           minHeight: "100vh",
           display: "grid",
           placeItems: "center",
+          py: 5,
         }}
       >
+        <Stack
+          component={"div"}
+          maxWidth={["100%", "500px"]}
+          spacing={2}
+          alignItems={"center"}
+        >
+          <Typography variant="h4" component={"h2"} textAlign={"center"}>
+            Register a new account
+          </Typography>
+          <Typography
+            variant="body1"
+            component={"h3"}
+            textAlign={"center"}
+            color="gray"
+            maxWidth={["100%", "300px"]}
+            marginInline={"auto"}
+          >
+            Use the form below to register for a new account, you can then use
+            our service.
+          </Typography>
+        </Stack>
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <Stack
             direction="column"
@@ -271,6 +298,12 @@ const Register = () => {
               variant="contained"
               color="primary"
               loading={isSubmitting}
+              sx={{
+                alignSelf: "center",
+                width: "fit-content",
+                textTransform: "capitalize",
+                px: 4,
+              }}
             >
               Register
             </LoadingButton>
@@ -281,19 +314,23 @@ const Register = () => {
               </Link>
             </Stack>
           </Stack>
+          <Snackbar
+            anchorOrigin={{ vertical, horizontal }}
+            open={open}
+            onClose={handleClose}
+            key={vertical + horizontal}
+            autoHideDuration={2000}
+          >
+            <Alert
+              onClose={handleClose}
+              severity="success"
+              sx={{ width: "100%" }}
+            >
+              You registered successfully!
+            </Alert>
+          </Snackbar>
         </form>
       </Container>
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={open}
-        onClose={handleClose}
-        key={vertical + horizontal}
-        autoHideDuration={2000}
-      >
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
-          You registered successfully!
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };
