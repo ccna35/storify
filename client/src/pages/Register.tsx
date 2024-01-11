@@ -3,19 +3,29 @@ import {
   Box,
   Container,
   Link,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Snackbar,
+  SnackbarOrigin,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import axios from "axios";
-import { useForm } from "react-hook-form";
+import { UseFormGetValues, useForm } from "react-hook-form";
 import { API_URL } from "../env";
 import { LoadingButton } from "@mui/lab";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { UserService } from "../api/users";
+import { ErrorOutline, WarningAmber } from "@mui/icons-material";
 
-type FormValues = {
+export type UserFormValues = {
+  id?: number;
   first_name: string;
   last_name: string;
   user_email: string;
@@ -23,7 +33,7 @@ type FormValues = {
   confirm_user_password: string;
 };
 
-const INITIAL_VALUES: FormValues = {
+const INITIAL_VALUES: UserFormValues = {
   first_name: "",
   last_name: "",
   user_email: "",
@@ -31,11 +41,32 @@ const INITIAL_VALUES: FormValues = {
   confirm_user_password: "",
 };
 
+interface State extends SnackbarOrigin {
+  open: boolean;
+}
+
 const Register = () => {
+  const queryClient = useQueryClient();
+
+  const [state, setState] = useState<State>({
+    open: false,
+    vertical: "top",
+    horizontal: "center",
+  });
+  const { vertical, horizontal, open } = state;
+
+  const showSuccessMessage = () => {
+    setState({ ...state, open: true });
+  };
+
+  const handleClose = () => {
+    setState({ ...state, open: false });
+  };
+
   const { user, updateUserInfo } = useContext(UserContext);
 
   const navigate = useNavigate();
-  const [errorMsg, setErrorMsg] = useState("");
+  // const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -43,60 +74,88 @@ const Register = () => {
     }
   }, [navigate, user]);
 
-  // To help us abort the request when component unmounts
-  const controller = useMemo(() => new AbortController(), []);
-  const signal = controller.signal;
+  const {
+    mutateAsync: signup,
+    isError,
+    error,
+    isPending,
+    data,
+  } = useMutation({
+    mutationFn: UserService.signup,
+    onSuccess: (data) => {
+      console.log(data);
 
-  useEffect(() => {
-    return () => {
-      // Cancel the request when the component unmounts
-      controller.abort();
-    };
-  }, [controller]);
+      // updateUserInfo(res.data.user);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (error) => {
+      // console.log(error);
+    },
+  });
 
   const {
     getValues,
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<FormValues>({
+  } = useForm<UserFormValues>({
     defaultValues: INITIAL_VALUES,
     mode: "onChange",
   });
-  const onSubmit = async (data: FormValues) => {
-    setErrorMsg("");
-    try {
-      const res = await axios.post(API_URL + "users/signup", data, {
-        withCredentials: true,
-        signal,
-      });
-      console.log(res);
-      // Update user state with new data
-      updateUserInfo(res.data.user);
 
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/");
+  // console.log(errors[""]);
+
+  const onSubmit = async (data: UserFormValues) => {
+    signup(data);
+    // setErrorMsg("");
+    try {
+      // const res = await axios.post(API_URL + "users/signup", data, {
+      //   withCredentials: true,
+      //   signal,
+      // });
+      // console.log(res);
+      // Update user state with new data
+      // updateUserInfo(res.data.user);
+      // localStorage.setItem("user", JSON.stringify(res.data.user));
+      // navigate("/");
     } catch (error) {
-      setErrorMsg(error.response.data.message);
+      // setErrorMsg(error.response.data.message);
     }
   };
 
+  if (isError) {
+    console.log(error.name);
+  }
+
+  const errorMessage =
+    error?.message === "Request failed with status code 400"
+      ? "User with this email already exists"
+      : error?.message;
+
   return (
-    <Box sx={{ minHeight: "100vh", py: 5 }}>
-      <Container maxWidth="lg" sx={{ marginInline: "auto" }}>
+    <Box>
+      <Container
+        maxWidth="xl"
+        sx={{
+          marginInline: "auto",
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+        }}
+      >
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <Stack
             direction="column"
-            spacing={2}
-            sx={{ maxWidth: "500px", marginInline: "auto" }}
+            spacing={3}
+            sx={{ width: ["100%", "500px"], marginInline: "auto", py: 4 }}
           >
-            {errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+            {isError && <Alert severity="error">{errorMessage}</Alert>}
             <Stack direction="column" spacing={1}>
               <TextField
                 label="First Name"
                 type="text"
                 {...register("first_name", {
-                  required: "This field is required!",
+                  required: "First name is required!",
                   validate: {
                     length: (value) => {
                       return (
@@ -107,16 +166,13 @@ const Register = () => {
                   },
                 })}
               />
-              {errors.first_name && (
-                <Alert severity="error">{errors.first_name.message}</Alert>
-              )}
             </Stack>
             <Stack direction="column" spacing={1}>
               <TextField
                 label="Last Name"
                 type="text"
                 {...register("last_name", {
-                  required: "This field is required!",
+                  required: "Last name is required!",
                   validate: {
                     length: (value) => {
                       return (
@@ -127,16 +183,13 @@ const Register = () => {
                   },
                 })}
               />
-              {errors.last_name && (
-                <Alert severity="error">{errors.last_name.message}</Alert>
-              )}
             </Stack>
             <Stack direction="column" spacing={1}>
               <TextField
                 label="Email"
                 type="email"
                 {...register("user_email", {
-                  required: "This field is required!",
+                  required: "Email is required!",
                   validate: {
                     isEmail: (value) => {
                       const emailRegEx =
@@ -148,16 +201,13 @@ const Register = () => {
                   },
                 })}
               />
-              {errors.user_email && (
-                <Alert severity="error">{errors.user_email.message}</Alert>
-              )}
             </Stack>
             <Stack direction="column" spacing={1}>
               <TextField
                 label="Password"
                 type="password"
                 {...register("user_password", {
-                  required: "This field is required!",
+                  required: "Password is required!",
                   validate: {
                     isValidPassword: (value) => {
                       const passwordRegex =
@@ -170,16 +220,13 @@ const Register = () => {
                   },
                 })}
               />
-              {errors.user_password && (
-                <Alert severity="error">{errors.user_password.message}</Alert>
-              )}
             </Stack>
             <Stack direction="column" spacing={1}>
               <TextField
                 label="Confirm Password"
                 type="password"
                 {...register("confirm_user_password", {
-                  required: "This field is required!",
+                  required: "Second password is required!",
                   validate: {
                     doPasswordsMatch: (val) => {
                       return (
@@ -190,12 +237,35 @@ const Register = () => {
                   },
                 })}
               />
-              {errors.confirm_user_password && (
-                <Alert severity="error">
-                  {errors.confirm_user_password.message}
-                </Alert>
-              )}
             </Stack>
+            {Object.keys(errors).length !== 0 && (
+              <List
+                sx={{
+                  borderRadius: 2,
+                  bgcolor: "#fff0f3",
+                  border: "1px solid #800f2f",
+                }}
+              >
+                {Array.from(Object.keys(errors)).map((error) => {
+                  console.log(error);
+
+                  return (
+                    <ListItem>
+                      <ListItemIcon>
+                        <ErrorOutline sx={{ color: "#800f2f" }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={errors[error as keyof UserFormValues]?.message}
+                        sx={{
+                          color: "#800f2f",
+                        }}
+                        prefix="- "
+                      />
+                    </ListItem>
+                  );
+                })}
+              </List>
+            )}
             <LoadingButton
               type="submit"
               variant="contained"
@@ -213,6 +283,17 @@ const Register = () => {
           </Stack>
         </form>
       </Container>
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={open}
+        onClose={handleClose}
+        key={vertical + horizontal}
+        autoHideDuration={2000}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          You registered successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

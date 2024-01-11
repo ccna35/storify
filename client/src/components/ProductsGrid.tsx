@@ -9,7 +9,7 @@ import { useContext, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ProductService } from "../api";
+import { ProductService } from "../api/products";
 import SpinnerOfDoom from "./Spinners/SpinnerOfDoom";
 import {
   Alert,

@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useContext, useState } from "react";
-import { ProductService } from "../../../../api";
+import { ProductService } from "../../../../api/products";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
 import { GridRowId } from "@mui/x-data-grid";
