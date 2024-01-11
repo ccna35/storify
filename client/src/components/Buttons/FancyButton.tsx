@@ -7,14 +7,7 @@ const FancyButton = () => {
       disableElevation
       disableFocusRipple
       disableRipple
-<<<<<<< HEAD
-      color="secondary"
-      sx={{
-        border: (theme) => `2px solid ${theme.palette.primary}`,
-      }}
-=======
       color="primary"
->>>>>>> origin/main
     >
       Fancy Button
     </Button>
