@@ -7,7 +7,7 @@ const FancyButton = () => {
       disableElevation
       disableFocusRipple
       disableRipple
-      color="secondary"
+      color="primary"
     >
       Fancy Button
     </Button>
