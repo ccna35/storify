@@ -17,39 +17,69 @@ import axios from "axios";
 import { API_URL } from "../../env";
 import { LoadingButton } from "@mui/lab";
 import Collapse from "@mui/material/Collapse";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import DraftsIcon from "@mui/icons-material/Drafts";
-import SendIcon from "@mui/icons-material/Send";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import StarBorder from "@mui/icons-material/StarBorder";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import InventoryIcon from "@mui/icons-material/Inventory";
+import CircleIcon from "@mui/icons-material/Circle";
+import SettingsIcon from "@mui/icons-material/Settings";
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import {
+  CircleTwoTone,
+  DashboardCustomizeOutlined,
+  DashboardCustomizeTwoTone,
+} from "@mui/icons-material";
 
 type MenuItemType = {
   id: number;
   name: string;
   path?: string;
-  subMenu?: { id: number; name: string; path: string }[];
+  icon: JSX.Element;
+  subMenu?: { id: number; name: string; path: string; icon: JSX.Element }[];
 };
 
 type SidebarMenuItemsType = MenuItemType[];
 
 const SidebarMenuItems: SidebarMenuItemsType = [
-  { id: 1, name: "Dashboard", path: "/" },
+  { id: 1, name: "Dashboard", path: "/", icon: <DashboardCustomizeOutlined /> },
   {
     id: 2,
     name: "Products",
+    icon: <InventoryIcon />,
     subMenu: [
-      { id: 3, name: "Product List", path: "/products" },
-      { id: 4, name: "Add Product", path: "/new-product" },
+      {
+        id: 3,
+        name: "Product List",
+        path: "/products",
+        icon: (
+          <CircleIcon
+            sx={{
+              fontSize: 10,
+            }}
+          />
+        ),
+      },
+      {
+        id: 4,
+        name: "Add Product",
+        path: "/new-product",
+        icon: (
+          <CircleIcon
+            sx={{
+              fontSize: 10,
+            }}
+          />
+        ),
+      },
     ],
   },
-  { id: 5, name: "Profile", path: "/profile" },
-  { id: 6, name: "Settings", path: "/settings" },
+  { id: 5, name: "Profile", path: "/profile", icon: <AccountCircleIcon /> },
+  { id: 6, name: "Settings", path: "/settings", icon: <SettingsIcon /> },
 ];
 
 type MenuItemProps = (typeof SidebarMenuItems)[number];
 
-const MenuItem = ({ name, path, subMenu }: MenuItemProps) => {
+const MenuItem = ({ name, path, subMenu, icon }: MenuItemProps) => {
   const [open, setOpen] = useState(false);
 
   const handleClick = () => {
@@ -65,9 +95,14 @@ const MenuItem = ({ name, path, subMenu }: MenuItemProps) => {
       }}
     >
       <ListItemIcon>
-        <InboxIcon />
+        <DashboardCustomizeTwoTone />
       </ListItemIcon>
-      <ListItemText primary={name} />
+      <ListItemText
+        primary={name}
+        sx={{
+          color: "grey",
+        }}
+      />
       {subMenu && (open ? <ExpandLess /> : <ExpandMore />)}
     </ListItemButton>
   );
@@ -80,8 +115,15 @@ const MenuItem = ({ name, path, subMenu }: MenuItemProps) => {
           to={path}
           sx={{
             textDecoration: "none",
+            color: "grey",
             "&.active .MuiButtonBase-root": {
               background: "#e9ecef",
+              color: "#343a40",
+              fontWeight: 500,
+            },
+            "&.active .MuiButtonBase-root .MuiListItemText-root": {
+              color: "#343a40",
+              fontWeight: 500,
             },
           }}
         >
@@ -94,7 +136,7 @@ const MenuItem = ({ name, path, subMenu }: MenuItemProps) => {
       {subMenu && (
         <Collapse in={open} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {subMenu.map(({ id, name, path }) => {
+            {subMenu.map(({ id, name, path, icon }) => {
               return (
                 <Link
                   key={id}
@@ -102,15 +144,16 @@ const MenuItem = ({ name, path, subMenu }: MenuItemProps) => {
                   to={path}
                   sx={{
                     textDecoration: "none",
+                    color: "grey",
                     "&.active .MuiButtonBase-root": {
                       background: "#e9ecef",
+                      color: "#343a40",
+                      fontWeight: 500,
                     },
                   }}
                 >
-                  <ListItemButton key={id} sx={{ pl: 4, borderRadius: 2 }}>
-                    <ListItemIcon>
-                      <StarBorder />
-                    </ListItemIcon>
+                  <ListItemButton key={id} sx={{ borderRadius: 2, pl: 4 }}>
+                    <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText primary={name} />
                   </ListItemButton>
                 </Link>

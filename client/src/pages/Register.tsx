@@ -13,16 +13,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import axios from "axios";
-import { UseFormGetValues, useForm } from "react-hook-form";
-import { API_URL } from "../env";
+import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserService } from "../api/users";
-import { ErrorOutline, WarningAmber } from "@mui/icons-material";
+import { ErrorOutline } from "@mui/icons-material";
 
 export type UserFormValues = {
   id?: number;
@@ -66,7 +64,6 @@ const Register = () => {
   const { user, updateUserInfo } = useContext(UserContext);
 
   const navigate = useNavigate();
-  // const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -112,20 +109,6 @@ const Register = () => {
 
   const onSubmit = async (data: UserFormValues) => {
     signup(data);
-    // setErrorMsg("");
-    try {
-      // const res = await axios.post(API_URL + "users/signup", data, {
-      //   withCredentials: true,
-      //   signal,
-      // });
-      // console.log(res);
-      // Update user state with new data
-      // updateUserInfo(res.data.user);
-      // localStorage.setItem("user", JSON.stringify(res.data.user));
-      // navigate("/");
-    } catch (error) {
-      // setErrorMsg(error.response.data.message);
-    }
   };
 
   if (isError) {

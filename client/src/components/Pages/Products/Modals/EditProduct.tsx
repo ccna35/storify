@@ -2,12 +2,12 @@ import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import {
   Alert,
   Button,
   Checkbox,
+  FormControlLabel,
   Snackbar,
   SnackbarOrigin,
   Stack,
@@ -19,34 +19,14 @@ import { ProductService } from "../../../../api/products";
 import { useForm } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
 import { GridRowId } from "@mui/x-data-grid";
-import SpinnerOfDoom from "../../../Spinners/SpinnerOfDoom";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../../../hooks/UserContext";
+import { ProductFormValues } from "../../../../pages/NewProduct";
 
 type EditProductModalProps = {
   open: boolean;
   handleClose: () => void;
   product_id: GridRowId;
-};
-
-type ProductFormValues = {
-  product_name: string;
-  description: string;
-  price: number;
-  stock_quantity: number;
-  manufacturer: string;
-  category: string;
-  is_featured: boolean;
-};
-
-const INITIAL_VALUES: ProductFormValues = {
-  product_name: "",
-  description: "",
-  price: 0,
-  stock_quantity: 0,
-  manufacturer: "",
-  category: "",
-  is_featured: false,
 };
 
 interface State extends SnackbarOrigin {
@@ -116,11 +96,7 @@ export default function EditProductModal({
     handleSubmit,
     formState: { errors },
   } = useForm<ProductFormValues>({
-    defaultValues: {
-      price: 0,
-      stock_quantity: 0,
-      is_featured: false,
-    },
+    values: data && data[0],
     mode: "onChange",
   });
 
@@ -140,7 +116,6 @@ export default function EditProductModal({
               <Stack direction="column" spacing={2} py={2}>
                 <Stack direction="column" spacing={1}>
                   <TextField
-                    defaultValue={data[0].product_name}
                     label="Product name"
                     type="text"
                     {...register("product_name", {
@@ -163,7 +138,6 @@ export default function EditProductModal({
                 </Stack>
                 <Stack direction="column" spacing={1}>
                   <TextField
-                    defaultValue={data[0].description}
                     label="Description"
                     type="text"
                     {...register("description", {
@@ -184,7 +158,6 @@ export default function EditProductModal({
                 </Stack>
                 <Stack direction="column" spacing={1}>
                   <TextField
-                    defaultValue={data[0].price}
                     label="Price"
                     type="number"
                     {...register("price", {
@@ -205,7 +178,6 @@ export default function EditProductModal({
                 </Stack>
                 <Stack direction="column" spacing={1}>
                   <TextField
-                    defaultValue={data[0].stock_quantity}
                     label="Stock quantity"
                     type="number"
                     {...register("stock_quantity", {
@@ -228,7 +200,6 @@ export default function EditProductModal({
                 </Stack>
                 <Stack direction="column" spacing={1}>
                   <TextField
-                    defaultValue={data[0].manufacturer}
                     label="Manufacturer"
                     type="text"
                     {...register("manufacturer", {
@@ -251,7 +222,6 @@ export default function EditProductModal({
                 </Stack>
                 <Stack direction="column" spacing={1}>
                   <TextField
-                    defaultValue={data[0].category}
                     label="Category"
                     type="text"
                     {...register("category", {
@@ -270,14 +240,20 @@ export default function EditProductModal({
                     <Alert severity="error">{errors.category.message}</Alert>
                   )}
                 </Stack>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography>Mark featured?</Typography>
-                  <Checkbox
-                    size="small"
-                    {...register("is_featured")}
-                    defaultChecked={data[0].is_featured === 1}
-                  />
-                </Stack>
+                <FormControlLabel
+                  sx={{
+                    alignSelf: "flex-start",
+                  }}
+                  label="Mark featured?"
+                  labelPlacement="start"
+                  control={
+                    <Checkbox
+                      size="small"
+                      {...register("is_featured")}
+                      defaultChecked={data[0].is_featured === 1}
+                    />
+                  }
+                />
                 <LoadingButton
                   type="submit"
                   variant="contained"

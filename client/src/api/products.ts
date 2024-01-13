@@ -2,14 +2,14 @@ import { GridRowId } from "@mui/x-data-grid";
 import { query } from "../config/config";
 import { ProductFormValues } from "../pages/NewProduct";
 
-type Product = {
+export type Product = {
   product_name: string;
   description: string;
   price: number;
   stock_quantity: number;
   manufacturer: string;
   category: string;
-  is_featured: number;
+  is_featured: number | boolean;
 };
 
 const getProducts = async (page: number = 0): Promise<Product[]> => {

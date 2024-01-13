@@ -24,7 +24,7 @@ export type ProductFormValues = {
   stock_quantity: number;
   manufacturer: string;
   category: string;
-  is_featured: boolean;
+  is_featured: number | boolean;
 };
 
 const INITIAL_VALUES: ProductFormValues = {

@@ -13,8 +13,6 @@ import { ProductService } from "../api/products";
 import SpinnerOfDoom from "./Spinners/SpinnerOfDoom";
 import {
   Alert,
-  Box,
-  Button,
   Chip,
   LinearProgress,
   Snackbar,
@@ -24,15 +22,7 @@ import {
   linearProgressClasses,
   styled,
 } from "@mui/material";
-import {
-  Cancel,
-  Check,
-  Edit,
-  ImportContactsSharp,
-  InsertComment,
-  RemoveRedEye,
-} from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
+import { Cancel, Check, Edit, RemoveRedEye } from "@mui/icons-material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditProductModal from "./Pages/Products/Modals/EditProduct";
 
@@ -275,7 +265,6 @@ export default function ProductsGrid() {
   const {
     data: rows,
     isLoading,
-    isSuccess,
     isError,
     error,
   } = useQuery({
