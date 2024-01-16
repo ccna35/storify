@@ -1,24 +1,12 @@
 import {
-  DataGrid,
-  GridActionsCellItem,
   GridColDef,
-  GridFilterItem,
-  GridFilterOperator,
   GridLogicOperator,
   GridRowId,
-  GridToolbar,
-  GridToolbarColumnsButton,
   GridToolbarContainer,
-  GridToolbarExport,
-  GridToolbarQuickFilter,
+  gridFilterModelSelector,
+  useGridSelector,
 } from "@mui/x-data-grid";
-import {
-  useContext,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../hooks/UserContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,18 +15,14 @@ import SpinnerOfDoom from "./Spinners/SpinnerOfDoom";
 import {
   Alert,
   Box,
-  Button,
   Checkbox,
   Chip,
   FormControl,
   InputLabel,
-  LinearProgress,
   ListItemText,
   Menu,
   MenuItem,
   OutlinedInput,
-  Rating,
-  RatingProps,
   Select,
   SelectChangeEvent,
   Snackbar,
@@ -48,23 +32,17 @@ import {
   Tabs,
   TextField,
   Typography,
-  linearProgressClasses,
-  styled,
 } from "@mui/material";
-import { Cancel, Check, Edit, RemoveRedEye } from "@mui/icons-material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import EditProductModal from "./Pages/Products/Modals/EditProduct";
-import { GridToolbarFilterButton } from "@mui/x-data-grid";
-import { GridToolbarDensitySelector } from "@mui/x-data-grid";
-import { DataGridPro } from "@mui/x-data-grid-pro";
+import { DataGridPro, useGridApiContext } from "@mui/x-data-grid-pro";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { GridFilterInputValueProps } from "@mui/x-data-grid";
 import {
   MaterialRequestStatusType,
   useMaterialRequestStatusStore,
   useSearchStore,
 } from "../App";
+import { grey } from "@mui/material/colors";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -77,25 +55,7 @@ const MenuProps = {
   },
 };
 
-const names = [
-  "Oliver Hansen",
-  "Van Henry",
-  "April Tucker",
-  "Ralph Hubbard",
-  "Omar Alexander",
-  "Carlos Abbott",
-  "Miriam Wagner",
-  "Bradley Wilkerson",
-  "Virginia Andrews",
-  "Kelly Snyder",
-];
-
-// "error" | "default" | "success" | "info" | "warning" | "primary" | "secondary"
-
-// "Sent",
-// "Issued",
-// "Partially Issued",
-// "Cancelled",
+const flags = ["True", "False"];
 
 export type RowType = {
   product_id: number;
@@ -107,20 +67,48 @@ export type RowType = {
   price: string;
   product_name: string;
   stock_quantity: string;
-  is_featured: number;
+  is_featured: boolean;
 };
 
 interface State extends SnackbarOrigin {
   open: boolean;
 }
 
-function CustomToolbar() {
-  const {
-    data: rows,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+type MaterialsRequestStatus = {
+  id: number;
+  name: MaterialRequestStatusType;
+  color:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "error"
+    | "info"
+    | "success"
+    | "warning";
+  count: number;
+};
+
+type StatusColor = Partial<MaterialsRequestStatus>;
+
+const statusColors: StatusColor[] = [
+  { name: "All", color: "primary" },
+  { name: "Pending", color: "default" },
+  { name: "Sent", color: "info" },
+  { name: "Cancelled", color: "warning" },
+  { name: "Issued", color: "success" },
+  { name: "Partially Issued", color: "secondary" },
+];
+
+const CustomToolbar = () => {
+  const apiRef = useGridApiContext();
+  const { items, logicOperator } = useGridSelector(
+    apiRef,
+    gridFilterModelSelector
+  );
+
+  console.log(items, logicOperator);
+
+  const { data: rows } = useQuery({
     queryKey: ["products"],
     queryFn: () => ProductService.getProducts(),
     // queryFn: () => ProductService.getProducts(paginationModel.page),
@@ -128,46 +116,27 @@ function CustomToolbar() {
 
   const allCount = rows.length;
 
-  const cancelledCount = rows.filter(
-    (item) => item.MaterialsRequestStatus == "Cancelled"
-  ).length;
+  const getCount = (status: MaterialRequestStatusType) => {
+    console.log("Rendered");
 
-  const sentCount = rows.filter(
-    (item) => item.MaterialsRequestStatus == "Sent"
-  ).length;
+    return rows.filter((item) => item.MaterialsRequestStatus == status).length;
+  };
 
-  const issuedCount = rows.filter(
-    (item) => item.MaterialsRequestStatus == "Issued"
-  ).length;
+  const cancelledCount = useMemo(() => getCount("Cancelled"), []);
+  const sentCount = useMemo(() => getCount("Sent"), []);
+  const issuedCount = useMemo(() => getCount("Issued"), []);
+  const partiallyIssuedCount = useMemo(() => getCount("Partially Issued"), []);
 
-  const partiallyIssuedCount = rows.filter(
-    (item) => item.MaterialsRequestStatus == "Partially Issued"
-  ).length;
+  const pendingCount = useMemo(
+    () =>
+      rows.filter(
+        (item) =>
+          item.MaterialsRequestStatus == "Pending" && item.Flag == "True"
+      ).length,
+    []
+  );
 
-  const pendingCount = rows.filter(
-    (item) => item.MaterialsRequestStatus == "Pending"
-  ).length;
-
-  console.log(allCount);
-  console.log(sentCount);
-  console.log(pendingCount);
-  console.log(issuedCount);
-  console.log(partiallyIssuedCount);
-  console.log(cancelledCount);
-
-  const materialsRequestStatusList: {
-    id: number;
-    name: MaterialRequestStatusType;
-    color:
-      | "default"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning";
-    count: number;
-  }[] = [
+  const materialsRequestStatusList: MaterialsRequestStatus[] = [
     {
       id: 1,
       name: "All",
@@ -206,14 +175,31 @@ function CustomToolbar() {
     },
   ];
 
-  const { tabValue, handleMaterialsRequestStatus } =
-    useMaterialRequestStatusStore();
+  // Tabs state
+  const [tabValue, setTabValue] = useState<MaterialRequestStatusType>("All");
 
+  // Tabs logic
   const handleTabs = (
     event: React.SyntheticEvent,
     newValue: MaterialRequestStatusType
   ) => {
-    handleMaterialsRequestStatus(newValue);
+    setTabValue(newValue);
+    apiRef.current.upsertFilterItem({
+      field: "MaterialsRequestStatus",
+      operator: "equals",
+      value: newValue === "All" ? "" : newValue,
+      id: 2,
+    });
+  };
+
+  // Search input logic
+  const handleSearchInput = (value: string) => {
+    apiRef.current.upsertFilterItem({
+      field: "MaterialsRequestNo",
+      operator: "startsWith",
+      value: value,
+      id: 1,
+    });
   };
 
   const [personName, setPersonName] = useState<string[]>([]);
@@ -224,6 +210,16 @@ function CustomToolbar() {
     const {
       target: { value },
     } = event;
+
+    console.log(value);
+
+    apiRef.current.upsertFilterItem({
+      field: "Flag",
+      operator: "isAnyOf",
+      value: value,
+      id: 3,
+    });
+
     setPersonName(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
@@ -232,14 +228,14 @@ function CustomToolbar() {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
-
-  const { handleSearchValue } = useSearchStore();
 
   return (
     <GridToolbarContainer
@@ -287,18 +283,18 @@ function CustomToolbar() {
         width={"100%"}
       >
         <FormControl sx={{ width: 200 }}>
-          <InputLabel id="demo-multiple-checkbox-label">Tag</InputLabel>
+          <InputLabel id="demo-multiple-checkbox-label">Flag</InputLabel>
           <Select
             labelId="demo-multiple-checkbox-label"
             id="demo-multiple-checkbox"
             multiple
             value={personName}
             onChange={handleChangeSelectOption}
-            input={<OutlinedInput label="Tag" />}
+            input={<OutlinedInput label="Flag" />}
             renderValue={(selected) => selected.join(", ")}
             MenuProps={MenuProps}
           >
-            {names.map((name) => (
+            {flags.map((name) => (
               <MenuItem key={name} value={name}>
                 <Checkbox checked={personName.indexOf(name) > -1} />
                 <ListItemText primary={name} />
@@ -308,12 +304,12 @@ function CustomToolbar() {
         </FormControl>
         <TextField
           id="outlined-basic"
-          label="Outlined"
+          label="Material Request Number"
           variant="outlined"
           hiddenLabel={true}
           onChange={(e) => {
             console.log(e.target.value);
-            handleSearchValue(e.target.value);
+            handleSearchInput(e.target.value);
           }}
         />
         {/* <GridToolbarQuickFilter
@@ -339,15 +335,6 @@ function CustomToolbar() {
           }}
         /> */}
         <Box component={"div"} sx={{ alignSelf: "center" }}>
-          {/* <Button
-            id="demo-positioned-button"
-            aria-controls={open ? "demo-positioned-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClick}
-          >
-            Dashboard
-          </Button> */}
           <IconButton
             aria-label="more"
             id="long-button"
@@ -381,9 +368,18 @@ function CustomToolbar() {
       </Stack>
     </GridToolbarContainer>
   );
-}
+};
 
-export default function ProductsGrid() {
+export default function MaterialsRequestGrid() {
+  // const [tabValue, setTabValue] = useState<MaterialRequestStatusType>("Sent");
+
+  // const handleTabs = (
+  //   event: React.SyntheticEvent,
+  //   newValue: MaterialRequestStatusType
+  // ) => {
+  //   setTabValue(newValue);
+  // };
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -396,14 +392,14 @@ export default function ProductsGrid() {
         field: "idWorkOrder",
         headerName: "idWorkOrder",
         width: 150,
-        editable: true,
+
         type: "number",
       },
       {
         field: "MaterialsRequestNo",
         headerName: "MaterialsRequestNo",
         width: 110,
-        editable: true,
+
         type: "string",
         // renderCell: ({ value }) => {
         //   return "$" + value;
@@ -413,16 +409,18 @@ export default function ProductsGrid() {
         field: "MaterialsRequestStatus",
         headerName: "MaterialsRequestStatus",
         width: 110,
-        editable: true,
+
         type: "string",
         renderCell: ({ value }) => {
           return (
             <Chip
               label={value}
               variant="outlined"
-              // color={materialsRequestStatusList[value]?.color || "default"}
+              color={
+                statusColors.filter((status) => status.name == value)[0].color
+              }
               // sx={{
-              //   borderColor: value === "Issued" ? "green" : "orange",
+              //   backgroundColor: "lightgray",
               // }}
             />
           );
@@ -432,7 +430,7 @@ export default function ProductsGrid() {
         field: "SendingMail",
         headerName: "SendingMail",
         width: 110,
-        editable: true,
+
         // type: "string",
         // renderCell: ({ value }) => {
         //   return <Chip label={value} variant="filled" />;
@@ -442,21 +440,18 @@ export default function ProductsGrid() {
         field: "MailStatus",
         headerName: "MailStatus",
         width: 110,
-        editable: true,
         // type: "string",
       },
       {
         field: "IssueMailStatus",
         headerName: "IssueMailStatus",
         width: 110,
-        editable: true,
         // type: "string",
       },
       {
         field: "SentOn",
         headerName: "SentOn",
         width: 110,
-        editable: true,
         // type: "boolean",
         // renderCell: ({ value }) => {
         //   return value === 1 ? (
@@ -471,7 +466,6 @@ export default function ProductsGrid() {
         headerName: "IssuedOn",
         // type: "number",
         width: 110,
-        editable: true,
         // renderCell: ({ value }) => {
         //   return (
         //     <Stack sx={{ width: "100%" }} spacing={1}>
@@ -513,28 +507,28 @@ export default function ProductsGrid() {
         field: "Flag",
         headerName: "Flag",
         width: 110,
-        editable: true,
+
         // type: "string",
       },
       {
         field: "ActionDate",
         headerName: "ActionDate",
         width: 110,
-        editable: true,
+
         // type: "string",
       },
       {
         field: "ActionID",
         headerName: "ActionID",
         width: 110,
-        editable: true,
+
         // type: "string",
       },
       // {
       //   field: "actions",
       //   headerName: "",
       //   width: 110,
-      //   editable: true,
+      //
       //   type: "actions",
       //   getActions: ({ id }) => [
       //     <GridActionsCellItem
@@ -562,154 +556,6 @@ export default function ProductsGrid() {
     ],
     []
   );
-
-  // const columns: GridColDef[] = useMemo(
-  //   () => [
-  //     { field: "id", headerName: "ID", width: 90 },
-  //     {
-  //       field: "product_name",
-  //       headerName: "Product Name",
-  //       width: 150,
-  //       editable: true,
-  //       type: "string",
-  //     },
-  //     {
-  //       field: "price",
-  //       headerName: "Price",
-  //       width: 110,
-  //       editable: true,
-  //       type: "number",
-  //       renderCell: ({ value }) => {
-  //         return "$" + value;
-  //       },
-  //     },
-  //     {
-  //       field: "description",
-  //       headerName: "Description",
-  //       width: 110,
-  //       editable: true,
-  //       type: "string",
-  //     },
-  //     {
-  //       field: "category",
-  //       headerName: "Category",
-  //       width: 110,
-  //       editable: true,
-  //       type: "string",
-  //       renderCell: ({ value }) => {
-  //         return <Chip label={value} variant="filled" />;
-  //       },
-  //     },
-  //     {
-  //       field: "manufacturer",
-  //       headerName: "Manufacturer",
-  //       width: 110,
-  //       editable: true,
-  //       type: "string",
-  //     },
-  //     {
-  //       field: "created_at",
-  //       headerName: "Added",
-  //       width: 110,
-  //       editable: true,
-  //       type: "string",
-  //     },
-  //     {
-  //       field: "is_featured",
-  //       headerName: "Is Featured?",
-  //       width: 110,
-  //       editable: true,
-  //       type: "boolean",
-  //       renderCell: ({ value }) => {
-  //         return value === 1 ? (
-  //           <Check color="success" />
-  //         ) : (
-  //           <Cancel color="warning" />
-  //         );
-  //       },
-  //     },
-  //     {
-  //       field: "stock_quantity",
-  //       headerName: "Stock",
-  //       type: "number",
-  //       width: 110,
-  //       editable: true,
-  //       renderCell: ({ value }) => {
-  //         return (
-  //           <Stack sx={{ width: "100%" }} spacing={1}>
-  //             <BorderLinearProgress
-  //               variant="determinate"
-  //               value={value}
-  //               color={
-  //                 value < 10
-  //                   ? "error"
-  //                   : value >= 10 && value < 50
-  //                   ? "warning"
-  //                   : value >= 50 && value < 75
-  //                   ? "info"
-  //                   : "success"
-  //               }
-  //             />
-  //             {value === 0 ? (
-  //               <Typography
-  //                 textAlign={"center"}
-  //                 variant="caption"
-  //                 component={"span"}
-  //               >
-  //                 Out of stock
-  //               </Typography>
-  //             ) : (
-  //               <Typography
-  //                 textAlign={"center"}
-  //                 variant="caption"
-  //                 component={"span"}
-  //               >
-  //                 {value} in stock
-  //               </Typography>
-  //             )}
-  //           </Stack>
-  //         );
-  //       },
-  //     },
-  //     {
-  //       field: "updated_at",
-  //       headerName: "Updated At",
-  //       width: 110,
-  //       editable: true,
-  //       type: "string",
-  //     },
-  //     {
-  //       field: "actions",
-  //       headerName: "",
-  //       width: 110,
-  //       editable: true,
-  //       type: "actions",
-  //       getActions: ({ id }) => [
-  //         <GridActionsCellItem
-  //           icon={<RemoveRedEye />}
-  //           label="View"
-  //           showInMenu
-  //         />,
-  //         <GridActionsCellItem
-  //           icon={<Edit />}
-  //           label="Edit"
-  //           showInMenu
-  //           onClick={() => handleOpenEditModal(id)}
-  //         />,
-  //         <GridActionsCellItem
-  //           icon={<DeleteIcon color="error" />}
-  //           label="Delete"
-  //           sx={{
-  //             color: "red",
-  //           }}
-  //           onClick={() => handleProductDeletion(id)}
-  //           showInMenu
-  //         />,
-  //       ],
-  //     },
-  //   ],
-  //   []
-  // );
 
   const queryClient = useQueryClient();
 
@@ -787,9 +633,6 @@ export default function ProductsGrid() {
     navigate("/login");
   }
 
-  const { value } = useSearchStore();
-  const { tabValue } = useMaterialRequestStatusStore();
-
   if (isLoading) {
     return <SpinnerOfDoom />;
   }
@@ -804,39 +647,15 @@ export default function ProductsGrid() {
         columns={columns}
         loading={isLoading}
         disableRowSelectionOnClick
-        // paginationModel={paginationModel}
-        // paginationMode="server"
-        // onPaginationModelChange={setPaginationModel}
         getRowId={(row) => row.idMaterialsRequest}
-        filterModel={{
-          items: [
-            {
-              field: "MaterialsRequestNo",
-              operator: "startsWith",
-              value: value,
-              id: 1,
-            },
-            {
-              field: "MaterialsRequestStatus",
-              operator: "equals",
-              value: tabValue === "All" ? "" : tabValue,
-              id: 2,
-            },
-          ],
-          logicOperator: GridLogicOperator.And,
-        }}
         sx={{
           border: "none",
           backgroundColor: "rgb(255, 255, 255)",
           color: "rgb(33, 43, 54)",
           transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-          // backgroundImage: "none",
-          // overflow: "hidden",
-          // position: "relative",
           boxShadow:
             "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
           borderRadius: "16px",
-          // zIndex: 0,
           ".MuiDataGrid-columnHeaders": {
             backgroundColor: "#f8f9fa",
           },
