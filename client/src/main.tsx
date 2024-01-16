@@ -7,8 +7,6 @@ import App from "./App.tsx";
 
 import { LicenseInfo } from "@mui/x-license-pro";
 
-LicenseInfo.setLicenseKey(
-  "fa2cb00ddbab343d055a47f7d4fbf0a1Tz03MzM1NyxFPTE3MjQ0OTkxMDcwMDAsUz1wcm8sTE09c3Vic2NyaXB0aW9uLEtWPTI="
-);
+LicenseInfo.setLicenseKey(import.meta.env.VITE_LICENSE_KEY);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
