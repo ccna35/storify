@@ -193,9 +193,11 @@ const Sidebar = () => {
           width: "100%",
           maxWidth: 360,
           bgcolor: "background.paper",
-          border: "1px solid lightgray",
-          borderRadius: 2,
+          // border: "1px solid lightgray",
           padding: "5px",
+          boxShadow:
+            "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
+          borderRadius: "16px",
         }}
         component="nav"
         aria-labelledby="nested-list-subheader"
@@ -218,6 +220,9 @@ const Sidebar = () => {
         variant="contained"
         startIcon={<LogoutIcon />}
         onClick={handleLogout}
+        sx={{
+          borderRadius: "16px",
+        }}
       >
         Sign out
       </LoadingButton>

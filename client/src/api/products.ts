@@ -12,10 +12,13 @@ export type Product = {
   is_featured: number | boolean;
 };
 
-const getProducts = async (page: number = 0): Promise<Product[]> => {
-  const res = await query.get(`products?page=${page}`);
+const getProducts = async () => {
+  const res = await query.get("/");
+  // const res = await query.get(`products?page=${page}`);
 
-  return res.data;
+  // console.log(res.data.result);
+
+  return res.data.result;
 };
 
 const getOneProduct = async (id: number): Promise<Product[]> => {

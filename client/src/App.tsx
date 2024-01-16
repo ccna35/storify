@@ -63,6 +63,38 @@ export const useThemeStore = create<ThemeState>((set) => ({
     set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
 }));
 
+// Handle data grid search input
+interface SearchState {
+  value: string;
+  handleSearchValue: (newValue: string) => void;
+}
+
+export const useSearchStore = create<SearchState>((set) => ({
+  value: "",
+  handleSearchValue: (newValue) => set(() => ({ value: newValue })),
+}));
+
+// Handle data grid tabs => MaterialsRequestStatus
+export type MaterialRequestStatusType =
+  | "All"
+  | "Pending"
+  | "Sent"
+  | "Issued"
+  | "Partially Issued"
+  | "Cancelled";
+
+interface MaterialsRequestStatusState {
+  tabValue: MaterialRequestStatusType;
+  handleMaterialsRequestStatus: (newValue: MaterialRequestStatusType) => void;
+}
+
+export const useMaterialRequestStatusStore =
+  create<MaterialsRequestStatusState>((set) => ({
+    tabValue: "Sent",
+    handleMaterialsRequestStatus: (newValue) =>
+      set(() => ({ tabValue: newValue })),
+  }));
+
 declare module "@mui/material/styles" {
   interface Theme {
     borderRadius: {

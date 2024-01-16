@@ -38,8 +38,6 @@ export default function EditProductModal({
   handleClose,
   product_id,
 }: EditProductModalProps) {
-  console.log(product_id);
-
   const queryClient = useQueryClient();
 
   const navigate = useNavigate();
@@ -61,16 +59,10 @@ export default function EditProductModal({
     setState({ ...state, opened: false });
   };
 
-  console.log(product_id);
-
   const { data, isLoading, isSuccess, isError, error } = useQuery({
     queryKey: ["product", { product_id }],
     queryFn: () => ProductService.getOneProduct(product_id as number),
   });
-
-  if (isSuccess) {
-    console.log(data);
-  }
 
   if (isError) {
     console.log(error);
@@ -101,7 +93,6 @@ export default function EditProductModal({
   });
 
   const onSubmit = async (data: ProductFormValues) => {
-    console.log(data);
     updateProduct({ ...data, id: product_id as number });
   };
 
