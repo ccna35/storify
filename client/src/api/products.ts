@@ -16,8 +16,6 @@ const getProducts = async () => {
   const res = await query.get("/");
   // const res = await query.get(`products?page=${page}`);
 
-  // console.log(res.data.result);
-
   return res.data.result;
 };
 

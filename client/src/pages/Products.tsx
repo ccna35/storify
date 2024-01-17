@@ -1,7 +1,7 @@
 import { Stack } from "@mui/material";
 import "./products.css";
 import SummaryPanel from "../components/Summary Panel/SummaryPanel";
-import MaterialsRequestGrid from "../components/ProductsGrid";
+import MaterialsRequestGrid from "../components/Grid/ProductsGrid";
 
 const Products = () => {
   return (

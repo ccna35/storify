@@ -60,7 +60,17 @@
   max-height: 240px;
 }
 
-/* .MuiMenu-paper.css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
-  border: 1px solid;
-  box-shadow: none;
-} */
+.MuiPopper-root.MuiDataGrid-panel {
+  inset: 0px 0px auto auto !important;
+  transform: translate3d(-25px, 432.8px, 0px) !important;
+}
+
+.MuiDataGrid-filterForm {
+  gap: 1rem;
+}
+
+.MuiPopper-root.MuiDataGrid-menu .MuiPaper-root {
+  box-shadow: rgba(145, 158, 171, 0.24) 0px 0px 2px 0px,
+    rgba(145, 158, 171, 0.24) -20px 20px 40px -4px;
+  border-radius: 10px;
+}

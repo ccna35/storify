@@ -1,17 +1,18 @@
 import {
   GridColDef,
-  GridLogicOperator,
+  GridFilterInputDate,
+  GridFilterPanel,
   GridRowId,
+  GridToolbarColumnsButton,
   GridToolbarContainer,
-  gridFilterModelSelector,
-  useGridSelector,
+  GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
-import { useContext, useMemo, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext } from "../hooks/UserContext";
+import { UserContext } from "../../hooks/UserContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ProductService } from "../api/products";
-import SpinnerOfDoom from "./Spinners/SpinnerOfDoom";
+import { ProductService } from "../../api/products";
+import SpinnerOfDoom from "../Spinners/SpinnerOfDoom";
 import {
   Alert,
   Box,
@@ -19,12 +20,14 @@ import {
   Chip,
   FormControl,
   InputLabel,
+  LinearProgress,
   ListItemText,
   Menu,
   MenuItem,
   OutlinedInput,
   Select,
   SelectChangeEvent,
+  Skeleton,
   Snackbar,
   SnackbarOrigin,
   Stack,
@@ -32,17 +35,18 @@ import {
   Tabs,
   TextField,
   Typography,
+  styled,
 } from "@mui/material";
-import EditProductModal from "./Pages/Products/Modals/EditProduct";
+import EditProductModal from "../Pages/Products/Modals/EditProduct";
 import { DataGridPro, useGridApiContext } from "@mui/x-data-grid-pro";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import {
-  MaterialRequestStatusType,
-  useMaterialRequestStatusStore,
-  useSearchStore,
-} from "../App";
-import { grey } from "@mui/material/colors";
+import { MaterialRequestStatusType } from "../../App";
+import { GridToolbarFilterButton } from "@mui/x-data-grid";
+import { GridToolbarDensitySelector } from "@mui/x-data-grid";
+import { GridToolbarExport } from "@mui/x-data-grid";
+import { RemoveRedEye } from "@mui/icons-material";
+import CustomNoRowsOverlay from "./NoDataOverlay";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -101,17 +105,12 @@ const statusColors: StatusColor[] = [
 
 const CustomToolbar = () => {
   const apiRef = useGridApiContext();
-  const { items, logicOperator } = useGridSelector(
-    apiRef,
-    gridFilterModelSelector
-  );
 
-  console.log(items, logicOperator);
+  console.log(apiRef.current.state);
 
   const { data: rows } = useQuery({
     queryKey: ["products"],
     queryFn: () => ProductService.getProducts(),
-    // queryFn: () => ProductService.getProducts(paginationModel.page),
   });
 
   const allCount = rows.length;
@@ -176,7 +175,7 @@ const CustomToolbar = () => {
   ];
 
   // Tabs state
-  const [tabValue, setTabValue] = useState<MaterialRequestStatusType>("All");
+  const [tabValue, setTabValue] = useState<MaterialRequestStatusType>("Sent");
 
   // Tabs logic
   const handleTabs = (
@@ -281,6 +280,7 @@ const CustomToolbar = () => {
         spacing={2}
         alignItems={"stretch"}
         width={"100%"}
+        useFlexGap
       >
         <FormControl sx={{ width: 200 }}>
           <InputLabel id="demo-multiple-checkbox-label">Flag</InputLabel>
@@ -312,28 +312,6 @@ const CustomToolbar = () => {
             handleSearchInput(e.target.value);
           }}
         />
-        {/* <GridToolbarQuickFilter
-          fullWidth
-          sx={{
-            flexGrow: 1,
-            border: "1px solid lightgrey",
-            borderRadius: 5,
-            pb: 0,
-            ".MuiInput-underline": {
-              height: "100%",
-              padding: "0 1rem",
-            },
-            ".MuiInput-underline:before": {
-              border: "none",
-            },
-            ".MuiInputBase-root.MuiInput-underline:hover::before": {
-              border: "none",
-            },
-            ".MuiInputBase-root.MuiInput-underline.Mui-focused:after": {
-              border: "none",
-            },
-          }}
-        /> */}
         <Box component={"div"} sx={{ alignSelf: "center" }}>
           <IconButton
             aria-label="more"
@@ -365,21 +343,32 @@ const CustomToolbar = () => {
             <MenuItem onClick={handleClose}>Logout</MenuItem>
           </Menu>
         </Box>
+        <Stack
+          alignSelf={"center"}
+          direction={"row"}
+          spacing={2}
+          sx={{ marginLeft: "auto" }}
+        >
+          <GridToolbarColumnsButton
+            startIcon={<RemoveRedEye />}
+            sx={{ borderRadius: 3, px: 1, textTransform: "capitalize" }}
+          />
+          <GridToolbarFilterButton
+            sx={{ borderRadius: 3, px: 1, textTransform: "capitalize" }}
+          />
+          <GridToolbarExport
+            sx={{ borderRadius: 3, px: 1, textTransform: "capitalize" }}
+          />
+        </Stack>
       </Stack>
     </GridToolbarContainer>
   );
 };
 
 export default function MaterialsRequestGrid() {
-  // const [tabValue, setTabValue] = useState<MaterialRequestStatusType>("Sent");
+  const [isHideabale, setIsHideabale] = useState(false);
 
-  // const handleTabs = (
-  //   event: React.SyntheticEvent,
-  //   newValue: MaterialRequestStatusType
-  // ) => {
-  //   setTabValue(newValue);
-  // };
-
+  const handleColumnHideability = (data) => {};
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -387,30 +376,28 @@ export default function MaterialsRequestGrid() {
         headerName: "idMaterialsRequest",
         width: 90,
         type: "number",
+        hideable: isHideabale,
       },
       {
         field: "idWorkOrder",
         headerName: "idWorkOrder",
         width: 150,
-
         type: "number",
+        hideable: isHideabale,
       },
       {
         field: "MaterialsRequestNo",
         headerName: "MaterialsRequestNo",
         width: 110,
-
         type: "string",
-        // renderCell: ({ value }) => {
-        //   return "$" + value;
-        // },
+        hideable: isHideabale,
       },
       {
         field: "MaterialsRequestStatus",
         headerName: "MaterialsRequestStatus",
         width: 110,
-
         type: "string",
+        hideable: isHideabale,
         renderCell: ({ value }) => {
           return (
             <Chip
@@ -419,9 +406,6 @@ export default function MaterialsRequestGrid() {
               color={
                 statusColors.filter((status) => status.name == value)[0].color
               }
-              // sx={{
-              //   backgroundColor: "lightgray",
-              // }}
             />
           );
         },
@@ -430,83 +414,42 @@ export default function MaterialsRequestGrid() {
         field: "SendingMail",
         headerName: "SendingMail",
         width: 110,
-
-        // type: "string",
-        // renderCell: ({ value }) => {
-        //   return <Chip label={value} variant="filled" />;
-        // },
+        hideable: isHideabale,
       },
       {
         field: "MailStatus",
         headerName: "MailStatus",
         width: 110,
+        hideable: isHideabale,
+
         // type: "string",
       },
       {
         field: "IssueMailStatus",
         headerName: "IssueMailStatus",
         width: 110,
+        hideable: isHideabale,
+
         // type: "string",
       },
       {
         field: "SentOn",
         headerName: "SentOn",
         width: 110,
-        // type: "boolean",
-        // renderCell: ({ value }) => {
-        //   return value === 1 ? (
-        //     <Check color="success" />
-        //   ) : (
-        //     <Cancel color="warning" />
-        //   );
-        // },
+        hideable: isHideabale,
       },
       {
         field: "IssuedOn",
         headerName: "IssuedOn",
         // type: "number",
         width: 110,
-        // renderCell: ({ value }) => {
-        //   return (
-        //     <Stack sx={{ width: "100%" }} spacing={1}>
-        //       <BorderLinearProgress
-        //         variant="determinate"
-        //         value={value}
-        //         color={
-        //           value < 10
-        //             ? "error"
-        //             : value >= 10 && value < 50
-        //             ? "warning"
-        //             : value >= 50 && value < 75
-        //             ? "info"
-        //             : "success"
-        //         }
-        //       />
-        //       {value === 0 ? (
-        //         <Typography
-        //           textAlign={"center"}
-        //           variant="caption"
-        //           component={"span"}
-        //         >
-        //           Out of stock
-        //         </Typography>
-        //       ) : (
-        //         <Typography
-        //           textAlign={"center"}
-        //           variant="caption"
-        //           component={"span"}
-        //         >
-        //           {value} in stock
-        //         </Typography>
-        //       )}
-        //     </Stack>
-        //   );
-        // },
+        hideable: isHideabale,
       },
       {
         field: "Flag",
         headerName: "Flag",
         width: 110,
+        hideable: isHideabale,
 
         // type: "string",
       },
@@ -514,6 +457,7 @@ export default function MaterialsRequestGrid() {
         field: "ActionDate",
         headerName: "ActionDate",
         width: 110,
+        hideable: isHideabale,
 
         // type: "string",
       },
@@ -521,100 +465,16 @@ export default function MaterialsRequestGrid() {
         field: "ActionID",
         headerName: "ActionID",
         width: 110,
+        hideable: isHideabale,
 
         // type: "string",
       },
-      // {
-      //   field: "actions",
-      //   headerName: "",
-      //   width: 110,
-      //
-      //   type: "actions",
-      //   getActions: ({ id }) => [
-      //     <GridActionsCellItem
-      //       icon={<RemoveRedEye />}
-      //       label="View"
-      //       showInMenu
-      //     />,
-      //     <GridActionsCellItem
-      //       icon={<Edit />}
-      //       label="Edit"
-      //       showInMenu
-      //       onClick={() => handleOpenEditModal(id)}
-      //     />,
-      //     <GridActionsCellItem
-      //       icon={<DeleteIcon color="error" />}
-      //       label="Delete"
-      //       sx={{
-      //         color: "red",
-      //       }}
-      //       onClick={() => handleProductDeletion(id)}
-      //       showInMenu
-      //     />,
-      //   ],
-      // },
     ],
     []
   );
 
-  const queryClient = useQueryClient();
-
   const navigate = useNavigate();
   const { updateUserInfo } = useContext(UserContext);
-
-  const [state, setState] = useState<State>({
-    open: false,
-    vertical: "top",
-    horizontal: "center",
-  });
-  const { vertical, horizontal, open } = state;
-
-  const showSuccessMessage = () => {
-    setState({ ...state, open: true });
-  };
-
-  const handleCloseMessage = () => {
-    setState({ ...state, open: false });
-  };
-
-  const { mutateAsync: deleteProduct } = useMutation({
-    mutationFn: ProductService.deleteProduct,
-    onSuccess: () => {
-      showSuccessMessage();
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  // Handle deleting a product
-  const handleProductDeletion = (id: GridRowId) => {
-    console.log(id);
-
-    deleteProduct(id);
-  };
-
-  // Handle product id state and send it to the edit modal
-  const [productId, setProductId] = useState<null | GridRowId>(null);
-
-  // Edit modal logic
-  const [openEditModal, setOpenEditModal] = useState(false);
-
-  const handleOpenEditModal = (id: GridRowId) => {
-    setProductId(id);
-    setOpenEditModal(true);
-  };
-
-  const handleCloseEditModal = () => {
-    setOpenEditModal(false);
-  };
-
-  // Data grid logic
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 100,
-  });
 
   const {
     data: rows,
@@ -624,7 +484,6 @@ export default function MaterialsRequestGrid() {
   } = useQuery({
     queryKey: ["products"],
     queryFn: () => ProductService.getProducts(),
-    // queryFn: () => ProductService.getProducts(paginationModel.page),
   });
 
   if (isError) {
@@ -634,55 +493,79 @@ export default function MaterialsRequestGrid() {
   }
 
   if (isLoading) {
-    return <SpinnerOfDoom />;
+    return <Skeleton variant="rounded" height={300} />;
   }
 
   return (
-    <>
-      <DataGridPro
-        slots={{ toolbar: CustomToolbar }}
-        rowCount={10000}
-        pagination
-        rows={rows as any}
-        columns={columns}
-        loading={isLoading}
-        disableRowSelectionOnClick
-        getRowId={(row) => row.idMaterialsRequest}
-        sx={{
-          border: "none",
-          backgroundColor: "rgb(255, 255, 255)",
-          color: "rgb(33, 43, 54)",
-          transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-          boxShadow:
-            "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
-          borderRadius: "16px",
-          ".MuiDataGrid-columnHeaders": {
-            backgroundColor: "#f8f9fa",
+    <DataGridPro
+      onStateChange={(params, event, details) => {
+        console.log(params);
+        console.log(event);
+        console.log(details);
+      }}
+      autoHeight
+      initialState={{
+        columns: {
+          columnVisibilityModel: {
+            // idMaterialsRequest: false,
           },
-        }}
-      />
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={open}
-        onClose={handleCloseMessage}
-        key={vertical + horizontal}
-        autoHideDuration={2000}
-      >
-        <Alert
-          onClose={handleCloseMessage}
-          severity="success"
-          sx={{ width: "100%" }}
-        >
-          Product deleted successfully!
-        </Alert>
-      </Snackbar>
-      {productId && (
-        <EditProductModal
-          handleClose={handleCloseEditModal}
-          open={openEditModal}
-          product_id={productId}
-        />
-      )}
-    </>
+        },
+        filter: {
+          filterModel: {
+            items: [
+              {
+                field: "MaterialsRequestStatus",
+                operator: "equals",
+                value: "Sent",
+                id: 2,
+              },
+            ],
+          },
+        },
+      }}
+      slots={{
+        toolbar: CustomToolbar,
+        noResultsOverlay: CustomNoRowsOverlay,
+        loadingOverlay: LinearProgress,
+      }}
+      slotProps={{
+        columnsPanel: {
+          // disableShowAllButton: true,
+        },
+        basePopper: {
+          sx: {
+            // borderRadius: "16px",
+            // boxShadow:
+            //   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+            // "& .MuiPaper-root": {
+            //   boxShadow: "none",
+            // },
+          },
+        },
+      }}
+      rowCount={rows.length}
+      pagination
+      rows={rows as any}
+      columns={columns}
+      loading={isLoading}
+      disableRowSelectionOnClick
+      getRowId={(row) => row.idMaterialsRequest}
+      sx={{
+        border: "none",
+        backgroundColor: "rgb(255, 255, 255)",
+        color: "rgb(33, 43, 54)",
+        transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+        boxShadow:
+          "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
+        borderRadius: "16px",
+        ".MuiDataGrid-columnHeaders": {
+          backgroundColor: "#f8f9fa",
+        },
+        "&.css-1vq2q2m-MuiPopper-root-MuiDataGrid-panel": {
+          backgroundColor: "red",
+        },
+        "--DataGrid-overlayHeight": "300px",
+      }}
+    />
   );
 }
