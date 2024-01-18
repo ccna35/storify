@@ -5,6 +5,7 @@ import CustomerPreview from "../components/Pages/HomePage/Previews/Customer Prev
 import RecentInvoices from "../components/Pages/HomePage/Recents/RecentInvoices";
 import Cards from "../components/Pages/HomePage/Cards/Cards";
 import Formatting from "../components/Pages/HomePage/Charts/LineChart";
+import DemoBarChart from "../components/Pages/HomePage/Charts/DemoBarChart";
 
 const HomePage = () => {
   return (
@@ -12,6 +13,8 @@ const HomePage = () => {
       <Typography variant="h5" component={"h1"} fontWeight={500}>
         Hi, Welcome back 👋
       </Typography>
+      {/* <DemoBarCharts /> */}
+      <DemoBarChart />
       <Cards />
       <Formatting />
       {/* <Stats /> */}

@@ -1,5 +1,6 @@
 import {
   GridColDef,
+  GridEventListener,
   GridFilterInputDate,
   GridFilterPanel,
   GridRowId,
@@ -7,7 +8,7 @@ import {
   GridToolbarContainer,
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../hooks/UserContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -38,15 +39,20 @@ import {
   styled,
 } from "@mui/material";
 import EditProductModal from "../Pages/Products/Modals/EditProduct";
-import { DataGridPro, useGridApiContext } from "@mui/x-data-grid-pro";
+import {
+  DataGridPro,
+  useGridApiContext,
+  useGridApiRef,
+} from "@mui/x-data-grid-pro";
 import IconButton from "@mui/material/IconButton";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { MaterialRequestStatusType } from "../../App";
 import { GridToolbarFilterButton } from "@mui/x-data-grid";
 import { GridToolbarDensitySelector } from "@mui/x-data-grid";
 import { GridToolbarExport } from "@mui/x-data-grid";
-import { RemoveRedEye } from "@mui/icons-material";
+import { Preview, RemoveRedEye } from "@mui/icons-material";
 import CustomNoRowsOverlay from "./NoDataOverlay";
+import { useGridApiEventHandler } from "@mui/x-data-grid";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -105,8 +111,6 @@ const statusColors: StatusColor[] = [
 
 const CustomToolbar = () => {
   const apiRef = useGridApiContext();
-
-  console.log(apiRef.current.state);
 
   const { data: rows } = useQuery({
     queryKey: ["products"],
@@ -210,8 +214,6 @@ const CustomToolbar = () => {
       target: { value },
     } = event;
 
-    console.log(value);
-
     apiRef.current.upsertFilterItem({
       field: "Flag",
       operator: "isAnyOf",
@@ -235,6 +237,19 @@ const CustomToolbar = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  // const handleEvent: GridEventListener<"columnVisibilityModelChange"> = (
+  //   params, // GridColumnVisibilityModel
+  //   event, // MuiEvent<{}>
+  //   details // GridCallbackDetails
+  // ) => {
+  // };
+
+  // Imperative subscription
+  // apiRef.current.subscribeEvent("columnVisibilityModelChange", handleEvent);
+
+  // Hook subscription (only available inside the scope of the grid)
+  // useGridApiEventHandler(apiRef, "columnVisibilityModelChange", handleEvent);
 
   return (
     <GridToolbarContainer
@@ -308,7 +323,6 @@ const CustomToolbar = () => {
           variant="outlined"
           hiddenLabel={true}
           onChange={(e) => {
-            console.log(e.target.value);
             handleSearchInput(e.target.value);
           }}
         />
@@ -366,9 +380,60 @@ const CustomToolbar = () => {
 };
 
 export default function MaterialsRequestGrid() {
-  const [isHideabale, setIsHideabale] = useState(false);
+  const apiRef = useGridApiRef();
 
-  const handleColumnHideability = (data) => {};
+  type ColumnNamesType =
+    | "idMaterialsRequest"
+    | "idWorkOrder"
+    | "MaterialsRequestNo"
+    | "MaterialsRequestStatus"
+    | "SendingMail"
+    | "MailStatus"
+    | "IssueMailStatus"
+    | "SentOn"
+    | "IssuedOn"
+    | "Flag"
+    | "ActionDate"
+    | "ActionID"
+    | "LastUpdateDate"
+    | "LastUpdateID";
+
+  type ColumnHideability = Record<ColumnNamesType, boolean>;
+
+  const [isHideabale, setIsHideabale] = useState({
+    ActionDate: true,
+    ActionID: true,
+    Flag: true,
+    idMaterialsRequest: true,
+    idWorkOrder: true,
+    IssuedOn: true,
+    IssueMailStatus: true,
+    LastUpdateDate: false,
+    LastUpdateID: false,
+    MailStatus: false,
+    MaterialsRequestNo: false,
+    MaterialsRequestStatus: false,
+    SendingMail: false,
+    SentOn: false,
+  });
+
+  // {
+  //   ActionDate: true,
+  //   ActionID: true,
+  //   Flag: true,
+  //   idMaterialsRequest: true,
+  //   idWorkOrder: true,
+  //   IssuedOn: true,
+  //   IssueMailStatus: true,
+  //   LastUpdateDate: true,
+  //   LastUpdateID: true,
+  //   MailStatus: true,
+  //   MaterialsRequestNo: true,
+  //   MaterialsRequestStatus: true,
+  //   SendingMail: true,
+  //   SentOn: true,
+  // }
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -376,28 +441,28 @@ export default function MaterialsRequestGrid() {
         headerName: "idMaterialsRequest",
         width: 90,
         type: "number",
-        hideable: isHideabale,
+        hideable: isHideabale.idMaterialsRequest,
       },
       {
         field: "idWorkOrder",
         headerName: "idWorkOrder",
         width: 150,
         type: "number",
-        hideable: isHideabale,
+        hideable: isHideabale.idWorkOrder,
       },
       {
         field: "MaterialsRequestNo",
         headerName: "MaterialsRequestNo",
         width: 110,
         type: "string",
-        hideable: isHideabale,
+        hideable: isHideabale.MaterialsRequestNo,
       },
       {
         field: "MaterialsRequestStatus",
         headerName: "MaterialsRequestStatus",
         width: 110,
         type: "string",
-        hideable: isHideabale,
+        hideable: isHideabale.MaterialsRequestStatus,
         renderCell: ({ value }) => {
           return (
             <Chip
@@ -414,13 +479,13 @@ export default function MaterialsRequestGrid() {
         field: "SendingMail",
         headerName: "SendingMail",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.SendingMail,
       },
       {
         field: "MailStatus",
         headerName: "MailStatus",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.MailStatus,
 
         // type: "string",
       },
@@ -428,7 +493,7 @@ export default function MaterialsRequestGrid() {
         field: "IssueMailStatus",
         headerName: "IssueMailStatus",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.IssueMailStatus,
 
         // type: "string",
       },
@@ -436,20 +501,20 @@ export default function MaterialsRequestGrid() {
         field: "SentOn",
         headerName: "SentOn",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.SentOn,
       },
       {
         field: "IssuedOn",
         headerName: "IssuedOn",
         // type: "number",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.IssuedOn,
       },
       {
         field: "Flag",
         headerName: "Flag",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.Flag,
 
         // type: "string",
       },
@@ -457,7 +522,7 @@ export default function MaterialsRequestGrid() {
         field: "ActionDate",
         headerName: "ActionDate",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.ActionDate,
 
         // type: "string",
       },
@@ -465,7 +530,7 @@ export default function MaterialsRequestGrid() {
         field: "ActionID",
         headerName: "ActionID",
         width: 110,
-        hideable: isHideabale,
+        hideable: isHideabale.ActionID,
 
         // type: "string",
       },
@@ -498,11 +563,6 @@ export default function MaterialsRequestGrid() {
 
   return (
     <DataGridPro
-      onStateChange={(params, event, details) => {
-        console.log(params);
-        console.log(event);
-        console.log(details);
-      }}
       autoHeight
       initialState={{
         columns: {
