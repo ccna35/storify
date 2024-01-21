@@ -1,34 +1,119 @@
 import ReactApexChart from "react-apexcharts";
 
-const DemoBarChart = () => {
+type DemoBarChartProps = {
+  series: ApexAxisChartSeries | ApexNonAxisChartSeries | undefined;
+  xaxis: ApexXAxis | undefined;
+  title: string;
+  horizontal?: boolean;
+};
+
+const DemoBarChart = ({
+  series,
+  xaxis,
+  title,
+  horizontal = false,
+}: DemoBarChartProps) => {
   const options: ApexCharts.ApexOptions = {
+    title: {
+      text: title,
+      align: "center",
+      margin: 10,
+      offsetX: 0,
+      offsetY: 0,
+      floating: false,
+      style: {
+        fontSize: "16px",
+        fontWeight: "bold",
+        color: "#263238",
+      },
+    },
+    legend: {
+      show: true,
+      showForSingleSeries: false,
+      showForNullSeries: true,
+      showForZeroSeries: true,
+      position: "bottom",
+      horizontalAlign: "center",
+      floating: false,
+      fontSize: "14px",
+      fontFamily: "Helvetica, Arial",
+      fontWeight: 400,
+      formatter: undefined,
+      inverseOrder: false,
+      width: undefined,
+      height: undefined,
+      tooltipHoverFormatter: undefined,
+      customLegendItems: [],
+      offsetX: 0,
+      offsetY: 0,
+      labels: {
+        colors: undefined,
+        useSeriesColors: false,
+      },
+      markers: {
+        width: 12,
+        height: 12,
+        strokeWidth: 0,
+        strokeColor: "#fff",
+        fillColors: undefined,
+        radius: 12,
+        customHTML: undefined,
+        onClick: undefined,
+        offsetX: 0,
+        offsetY: 0,
+      },
+      itemMargin: {
+        horizontal: 5,
+        vertical: 0,
+      },
+      onItemClick: {
+        toggleDataSeries: true,
+      },
+      onItemHover: {
+        highlightDataSeries: true,
+      },
+    },
     chart: {
-      id: "basic-bar",
-      events: {
-        click: (e, chart, options) => console.log(options),
-        animationEnd(chart, options) {
-          console.log(chart);
+      type: "bar",
+      height: 430,
+    },
+    plotOptions: {
+      bar: {
+        horizontal,
+        // borderRadius: 5,
+        dataLabels: {
+          position: "top",
         },
       },
     },
-    xaxis: {
-      categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999],
+    dataLabels: {
+      enabled: !horizontal,
+      offsetY: -20,
+      style: {
+        fontSize: "12px",
+        colors: ["#304758"],
+      },
+    },
+    stroke: {
+      show: true,
+      width: 1,
+      colors: ["#fff"],
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
     },
   };
 
-  const series = [
-    {
-      name: "series-1",
-      data: [30, 40, 45, 50, 49, 60, 70, 91],
-    },
-  ];
-
   return (
     <ReactApexChart
-      options={{ ...options }}
+      options={{
+        ...options,
+        xaxis,
+      }}
       series={series}
       width={"100%"}
-      height={350}
+      height={430}
       type="bar"
     />
   );

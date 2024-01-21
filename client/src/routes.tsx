@@ -8,7 +8,7 @@ export const PRIVATE_ROUTES = [
     element: <HomePage />,
   },
   {
-    path: "/profile",
+    path: "/workOrder/:id",
     element: <Profile />,
   },
   {
