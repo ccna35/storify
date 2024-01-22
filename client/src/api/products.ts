@@ -12,9 +12,11 @@ export type Product = {
   is_featured: number | boolean;
 };
 
-const getProducts = async () => {
+const getProducts = async (page: number = 0) => {
   const res = await query.get("/");
-  // const res = await query.get(`products?page=${page}`);
+  // const res = await query.get(`products?page=${page}`, { signal });
+
+  // console.log(res.data);
 
   return res.data.result;
 };

@@ -3,6 +3,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Container, Switch } from "@mui/material";
 import { useThemeStore } from "../../App";
+import RouterBreadcrumbs from "../RouterBreadcrumbs";
 
 export default function Navbar() {
   const { switchTheme } = useThemeStore();

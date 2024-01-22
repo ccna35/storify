@@ -548,18 +548,20 @@ export default function MaterialsRequestGrid() {
     error,
   } = useQuery({
     queryKey: ["products"],
-    queryFn: () => ProductService.getProducts(),
+    queryFn: ({ signal }) => ProductService.getProducts(signal),
   });
 
   if (isError) {
     console.log(error);
-    updateUserInfo(null);
-    navigate("/login");
+    // updateUserInfo(null);
+    // navigate("/login");
   }
 
   if (isLoading) {
     return <Skeleton variant="rounded" height={300} />;
   }
+
+  return <Typography>Hello!</Typography>;
 
   return (
     <DataGridPro

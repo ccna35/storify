@@ -1,4 +1,5 @@
 import ReactApexChart from "react-apexcharts";
+import { useNavigate } from "react-router-dom";
 
 type DemoPieChartProps = {
   title: string;
@@ -15,7 +16,7 @@ const DemoPieChart = ({
   series,
   colors,
 }: DemoPieChartProps) => {
-  //   const series = [44, 55, 41, 17, 15];
+  const navigate = useNavigate();
   const options: ApexCharts.ApexOptions = {
     labels,
     colors,
@@ -35,6 +36,13 @@ const DemoPieChart = ({
     },
     chart: {
       type,
+      events: {
+        dataPointSelection(e, chart, options) {
+          navigate(
+            "/employeeStatus/" + labels[options.dataPointIndex].replace(" ", "")
+          );
+        },
+      },
     },
     responsive: [
       {

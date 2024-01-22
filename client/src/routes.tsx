@@ -1,4 +1,5 @@
 import { HomePage, Profile, Settings } from "./pages";
+import EmployeeStatus from "./pages/EmployeeStatus";
 import NewProduct from "./pages/NewProduct";
 import Products from "./pages/Products";
 
@@ -8,8 +9,8 @@ export const PRIVATE_ROUTES = [
     element: <HomePage />,
   },
   {
-    path: "/workOrder/:id",
-    element: <Profile />,
+    path: "/employeeStatus/:statusType",
+    element: <EmployeeStatus />,
   },
   {
     path: "/settings",

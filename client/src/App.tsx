@@ -18,6 +18,7 @@ import { createTheme } from "@mui/material/styles";
 import { red } from "@mui/material/colors";
 import { create } from "zustand";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -136,6 +137,7 @@ const App = () => {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
+        // staleTime: 5 * 60 * 1000,
       },
     },
   });
@@ -146,6 +148,7 @@ const App = () => {
         <CssBaseline />
         <RouterProvider router={router} fallbackElement={<SpinnerOfDoom />} />
       </ThemeProvider>
+      <ReactQueryDevtools />
     </QueryClientProvider>
   );
 };

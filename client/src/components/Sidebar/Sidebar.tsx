@@ -73,7 +73,7 @@ const SidebarMenuItems: SidebarMenuItemsType = [
       },
     ],
   },
-  { id: 5, name: "Profile", path: "/profile", icon: <AccountCircleIcon /> },
+  // { id: 5, name: "Profile", path: "/profile", icon: <AccountCircleIcon /> },
   { id: 6, name: "Settings", path: "/settings", icon: <SettingsIcon /> },
 ];
 

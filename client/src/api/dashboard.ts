@@ -13,11 +13,17 @@ export type Product = {
 const getDashboard = async () => {
   const res = await query.get("/GetDashboard");
 
-  console.log(res.data);
-
   return res.data;
+};
+
+const getEmployees = async (status: string) => {
+  const res = await query.get("/Get" + status);
+  console.log(res.data.NationalIDexpired);
+
+  return res.data.NationalIDexpired;
 };
 
 export const DashboardService = {
   getDashboard,
+  getEmployees,
 };

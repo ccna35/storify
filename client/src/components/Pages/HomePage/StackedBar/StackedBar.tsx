@@ -3,13 +3,14 @@ import ReactApexChart from "react-apexcharts";
 type StackedBarProps = {
   series: ApexAxisChartSeries | ApexNonAxisChartSeries;
   title: string;
+  colors: any[];
 };
 
-const StackedBar = ({ series, title }: StackedBarProps) => {
+const StackedBar = ({ series, title, colors }: StackedBarProps) => {
   const options: ApexCharts.ApexOptions = {
+    colors,
     chart: {
       type: "bar",
-      //   height: 150,
       stacked: true,
       stackType: "100%",
     },
@@ -17,10 +18,6 @@ const StackedBar = ({ series, title }: StackedBarProps) => {
       bar: {
         horizontal: true,
       },
-    },
-    stroke: {
-      width: 1,
-      colors: ["#fff"],
     },
     title: {
       text: title,
@@ -37,27 +34,16 @@ const StackedBar = ({ series, title }: StackedBarProps) => {
         show: false,
       },
     },
-    tooltip: {
-      y: {
-        formatter: function (val) {
-          return val + "K";
-        },
-      },
-    },
     fill: {
       opacity: 1,
     },
     legend: {
-      position: "bottom",
-      horizontalAlign: "left",
-      formatter: function (seriesName, opts) {
-        return seriesName + " - " + opts.w.globals.series[opts.seriesIndex];
-      },
+      show: false,
     },
   };
 
   return (
-    <ReactApexChart options={options} series={series} type="bar" height={150} />
+    <ReactApexChart options={options} series={series} type="bar" height={120} />
   );
 };
 
