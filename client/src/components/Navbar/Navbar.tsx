@@ -4,6 +4,8 @@ import Typography from "@mui/material/Typography";
 import { Container, Switch } from "@mui/material";
 import { useThemeStore } from "../../App";
 import RouterBreadcrumbs from "../RouterBreadcrumbs";
+import Breadcrumbs from "./Breadcrumbs";
+import BasicBreadcrumbs from "./Breadcrumbs";
 
 export default function Navbar() {
   const { switchTheme } = useThemeStore();

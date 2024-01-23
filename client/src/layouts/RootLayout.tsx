@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar/Navbar";
 import { UserProvider } from "../hooks/UserContext";
 import { Box, Container } from "@mui/material";
 import Sidebar from "../components/Sidebar/Sidebar";
+import BasicBreadcrumbs from "../components/Navbar/Breadcrumbs";
 
 const RootLayout = () => {
   return (
@@ -21,6 +22,7 @@ const RootLayout = () => {
               <Sidebar />
             </Box>
             <Box gridColumn="span 3">
+              <BasicBreadcrumbs />
               <Outlet />
             </Box>
           </Box>

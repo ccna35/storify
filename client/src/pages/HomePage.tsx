@@ -11,6 +11,12 @@ import InsuranceContainer from "../components/Pages/HomePage/InsuranceContainer"
 import { useMemo } from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import { Link as RouterLink } from "react-router-dom";
+import withHeadline from "../components/Pages/HomePage/withHeadline";
+
+const SimpleDataGridWithHeadline = withHeadline(
+  SimpleDataGrid,
+  "Pending Work Orders"
+);
 
 const HomePage = () => {
   const columns: GridColDef[] = useMemo(
@@ -124,6 +130,12 @@ const HomePage = () => {
     queryFn: () => DashboardService.getDashboard(),
   });
 
+  // return (
+  //   <Typography variant="h5" component={"h1"} fontWeight={500}>
+  //     Hi, Welcome back 👋
+  //   </Typography>
+  // );
+
   return (
     <Stack direction="column" spacing={4}>
       <Typography variant="h5" component={"h1"} fontWeight={500}>
@@ -144,7 +156,7 @@ const HomePage = () => {
             }}
           />
 
-          <SimpleDataGrid
+          <SimpleDataGridWithHeadline
             rows={data.WorkOrdersPending}
             columns={columns}
             id="idWorkOrder"

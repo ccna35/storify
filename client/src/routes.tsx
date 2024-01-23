@@ -17,6 +17,10 @@ export const PRIVATE_ROUTES = [
     element: <Settings />,
   },
   {
+    path: "/settings/user",
+    element: <Settings />,
+  },
+  {
     path: "/products",
     element: <Products />,
   },

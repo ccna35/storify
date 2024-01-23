@@ -1,5 +1,9 @@
+import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import { useNavigate } from "react-router-dom";
+import BasicModal from "../../../Modals/Modal";
+import { useQuery } from "@tanstack/react-query";
+import { DashboardService } from "../../../../api/dashboard";
 
 type DemoPieChartProps = {
   title: string;
@@ -16,6 +20,22 @@ const DemoPieChart = ({
   series,
   colors,
 }: DemoPieChartProps) => {
+  // Handle status state
+  const [status, setStatus] = useState("");
+
+  // Handle modal logic
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setStatus("");
+    setOpen(false);
+  };
+
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["employees"],
+  //   queryFn: () => DashboardService.getEmployees(status),
+  // });
+
   const navigate = useNavigate();
   const options: ApexCharts.ApexOptions = {
     labels,
@@ -34,13 +54,46 @@ const DemoPieChart = ({
         color: "#263238",
       },
     },
+    dataLabels: {
+      enabled: true,
+      enabledOnSeries: undefined,
+      offsetX: 0,
+      offsetY: 0,
+      background: {
+        enabled: false,
+        foreColor: "#fff",
+        padding: 4,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+        dropShadow: {
+          enabled: false,
+          top: 1,
+          left: 1,
+          blur: 1,
+          color: "#000",
+          opacity: 0.45,
+        },
+      },
+      dropShadow: {
+        enabled: false,
+        top: 1,
+        left: 1,
+        blur: 1,
+        color: "#000",
+        opacity: 0.45,
+      },
+    },
     chart: {
       type,
       events: {
         dataPointSelection(e, chart, options) {
-          navigate(
-            "/employeeStatus/" + labels[options.dataPointIndex].replace(" ", "")
-          );
+          setStatus(labels[options.dataPointIndex].replace(" ", ""));
+          handleOpen();
+          // navigate(
+          //   "/employeeStatus/" + labels[options.dataPointIndex].replace(" ", "")
+          // );
         },
       },
     },
@@ -59,7 +112,12 @@ const DemoPieChart = ({
     ],
   };
 
-  return <ReactApexChart options={options} series={series} type={type} />;
+  return (
+    <>
+      <ReactApexChart options={options} series={series} type={type} />
+      <BasicModal open={open} handleClose={handleClose} status={status} />
+    </>
+  );
 };
 
 export default DemoPieChart;
