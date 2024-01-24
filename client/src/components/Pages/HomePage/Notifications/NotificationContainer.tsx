@@ -5,6 +5,8 @@ import SimpleNotification from "./SimpleNotification";
 import BasicDateCalendar from "../BasicDatePicker";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { ArrowBackIosSharp, ArrowForwardIosSharp } from "@mui/icons-material";
+import EmployeeStatus from "../../../../pages/EmployeeStatus";
+import EmployeesInsuranceStatus from "../EmployeesInsuranceStatus";
 
 type NotificationsContainerProps = {
   data: any;

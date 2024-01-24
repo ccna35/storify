@@ -19,11 +19,12 @@ import { red } from "@mui/material/colors";
 import { create } from "zustand";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import DemoLayout from "./components/Layouts/DemoLayout.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/" element={<RootLayout />} errorElement={<ErrorPage />}>
+      <Route path="/" element={<DemoLayout />} errorElement={<ErrorPage />}>
         <Route element={<PrivateRoutes />}>
           {PRIVATE_ROUTES.map((route) => (
             <Route

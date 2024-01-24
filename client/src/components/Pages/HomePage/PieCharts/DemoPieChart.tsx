@@ -1,13 +1,10 @@
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
-import { useNavigate } from "react-router-dom";
 import BasicModal from "../../../Modals/Modal";
-import { useQuery } from "@tanstack/react-query";
-import { DashboardService } from "../../../../api/dashboard";
 
 type DemoPieChartProps = {
   title: string;
-  type?: "donut" | "pie";
+  type?: "donut" | "pie" | "radialBar";
   labels: string[];
   series: number[];
   colors?: any[];
@@ -31,12 +28,6 @@ const DemoPieChart = ({
     setOpen(false);
   };
 
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ["employees"],
-  //   queryFn: () => DashboardService.getEmployees(status),
-  // });
-
-  const navigate = useNavigate();
   const options: ApexCharts.ApexOptions = {
     labels,
     colors,
@@ -91,11 +82,37 @@ const DemoPieChart = ({
         dataPointSelection(e, chart, options) {
           setStatus(labels[options.dataPointIndex].replace(" ", ""));
           handleOpen();
-          // navigate(
-          //   "/employeeStatus/" + labels[options.dataPointIndex].replace(" ", "")
-          // );
         },
       },
+    },
+    plotOptions: {
+      pie: {
+        customScale: 0.85,
+        donut: {
+          size: "65%",
+          labels: {
+            show: true,
+          },
+        },
+      },
+      radialBar: {
+        dataLabels: {
+          name: {
+            fontSize: "22px",
+          },
+          value: {
+            fontSize: "16px",
+          },
+          total: {
+            show: true,
+            label: "Total",
+          },
+        },
+      },
+    },
+    legend: {
+      show: true,
+      position: "bottom",
     },
     responsive: [
       {

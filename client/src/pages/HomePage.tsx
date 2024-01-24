@@ -12,6 +12,9 @@ import { useMemo } from "react";
 import { GridColDef } from "@mui/x-data-grid";
 import { Link as RouterLink } from "react-router-dom";
 import withHeadline from "../components/Pages/HomePage/withHeadline";
+import EmployeesInsuranceStatus from "../components/Pages/HomePage/EmployeesInsuranceStatus";
+import BarComponent from "../components/Pages/HomePage/BarComponent";
+import DemoLineChart from "../components/Pages/HomePage/Charts/DemoLineChart";
 
 const SimpleDataGridWithHeadline = withHeadline(
   SimpleDataGrid,
@@ -137,7 +140,7 @@ const HomePage = () => {
   // );
 
   return (
-    <Stack direction="column" spacing={4}>
+    <Stack direction="column" spacing={4} sx={{ width: "100%" }}>
       <Typography variant="h5" component={"h1"} fontWeight={500}>
         Hi, Welcome back 👋
       </Typography>
@@ -147,7 +150,6 @@ const HomePage = () => {
       ) : (
         <>
           <NotificationsContainer data={data} />
-
           <Divider
             variant="fullWidth"
             orientation="horizontal"
@@ -155,24 +157,30 @@ const HomePage = () => {
               borderStyle: "dashed",
             }}
           />
-
-          <SimpleDataGridWithHeadline
-            rows={data.WorkOrdersPending}
-            columns={columns}
-            id="idWorkOrder"
-            columnVisibilityModel={{
-              idWorkOrder: false,
-              LastUpdateDate: false,
-              ActionDate: false,
-              ActionID: false,
-              GovernoratesName: false,
-              SubProjectsName: false,
-              SiteType: false,
-              CompanyProjectsName: false,
-              WorkOrderStatus: false,
+          <Box
+            sx={{
+              display: "grid",
+              // flexDirection: "row",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              gap: 3,
+              // justifyContent: "space-between",
+              alignItems: "flex-start",
             }}
-          />
+          >
+            <EmployeesInsuranceStatus data={data} />
 
+            <BarComponent
+              data={data.AllWorkOrderStatusThisYear}
+              barTitle="WorkOrderStatus"
+              chartTitle="Work Orders By Status"
+            />
+
+            <BarComponent
+              data={data.AllQuotationStatusThisYear}
+              barTitle="WorkOrderD6Status"
+              chartTitle="Pending Quotation Status"
+            />
+          </Box>
           <Box
             sx={{
               display: "flex",
@@ -210,6 +218,7 @@ const HomePage = () => {
                 ]}
               />
             </Box>
+
             <Box
               flex={1}
               sx={{
@@ -220,6 +229,7 @@ const HomePage = () => {
               }}
             >
               <DemoPieChart
+                // type="pie"
                 title="Work orders in progress"
                 labels={data.AllWorkOrdersInProgressPerProject.map(
                   (order) => order.CompanyProjectsName
@@ -230,7 +240,6 @@ const HomePage = () => {
               />
             </Box>
           </Box>
-
           <Box
             sx={{
               display: "flex",
@@ -304,6 +313,7 @@ const HomePage = () => {
               />
             </Box>
           </Box>
+
           <Box
             sx={{
               display: "flex",
@@ -311,33 +321,6 @@ const HomePage = () => {
               gap: 3,
             }}
           >
-            <Box
-              flex={1}
-              sx={{
-                boxShadow:
-                  "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
-                borderRadius: "10px",
-                padding: 2,
-              }}
-            >
-              <DemoBarChart
-                horizontal
-                title="Completed work without acceptance"
-                xaxis={{
-                  categories: data.WorkOrdersAndWaitingApprovalPerProject.map(
-                    (order) => order.CompanyProjectsName
-                  ),
-                }}
-                series={[
-                  {
-                    data: data.WorkOrdersAndWaitingApprovalPerProject.map(
-                      (order) => order.Count
-                    ),
-                    name: "2023",
-                  },
-                ]}
-              />
-            </Box>
             <Box
               flex={1}
               sx={{
@@ -357,9 +340,68 @@ const HomePage = () => {
                 )}
               />
             </Box>
+            <Box
+              flex={1}
+              sx={{
+                boxShadow:
+                  "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+                borderRadius: "10px",
+                padding: 2,
+              }}
+            >
+              {/* <DemoBarChart
+                // horizontal
+                title="Completed work without acceptance"
+                xaxis={{
+                  categories: data.WorkOrdersAndWaitingApprovalPerProject.map(
+                    (order) => order.CompanyProjectsName
+                  ),
+                }}
+                series={[
+                  {
+                    data: data.WorkOrdersAndWaitingApprovalPerProject.map(
+                      (order) => order.Count
+                    ),
+                    name: "2023",
+                  },
+                ]}
+              /> */}
+              <DemoLineChart
+                title="Completed work without acceptance"
+                xaxis={{
+                  categories: data.WorkOrdersAndWaitingApprovalPerProject.map(
+                    (order) => order.CompanyProjectsName
+                  ),
+                }}
+                series={[
+                  {
+                    data: data.WorkOrdersAndWaitingApprovalPerProject.map(
+                      (order) => order.Count
+                    ),
+                    name: "2023",
+                  },
+                ]}
+              />
+            </Box>
           </Box>
-          <InsuranceContainer data={data} />
-          <StackedBarsContainer data={data} />
+          <SimpleDataGridWithHeadline
+            rows={data.WorkOrdersPending}
+            columns={columns}
+            id="idWorkOrder"
+            columnVisibilityModel={{
+              idWorkOrder: false,
+              LastUpdateDate: false,
+              ActionDate: false,
+              ActionID: false,
+              GovernoratesName: false,
+              SubProjectsName: false,
+              SiteType: false,
+              CompanyProjectsName: false,
+              WorkOrderStatus: false,
+            }}
+          />
+          {/* <InsuranceContainer data={data} /> */}
+          {/* <StackedBarsContainer data={data} /> */}
         </>
       )}
     </Stack>

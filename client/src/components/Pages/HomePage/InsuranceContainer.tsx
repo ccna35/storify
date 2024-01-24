@@ -25,7 +25,7 @@ const InsuranceContainer = ({ data }: InsuranceContainerProps) => {
       >
         <DemoPieChart
           title="Medical Insurance"
-          type="pie"
+          type="donut"
           labels={["Covered", "Not Covered"]}
           series={[
             data.CountCoveredMedical[0].Count,
@@ -45,7 +45,7 @@ const InsuranceContainer = ({ data }: InsuranceContainerProps) => {
       >
         <DemoPieChart
           title="Social Insurance"
-          type="pie"
+          type="donut"
           labels={["Insured", "Not Insured"]}
           series={[
             data.CountInsured[0].Count,
