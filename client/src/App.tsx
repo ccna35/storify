@@ -27,28 +27,13 @@ const router = createBrowserRouter(
       <Route path="/" element={<DemoLayout />} errorElement={<ErrorPage />}>
         <Route element={<PrivateRoutes />}>
           {PRIVATE_ROUTES.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={
-                <Suspense fallback={<SpinnerOfDoom />}>
-                  {route.element}
-                </Suspense>
-              }
-            />
+            <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
       </Route>
       <Route element={<AuthRoutes />}>
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/register"
-          element={
-            <Suspense fallback={<SpinnerOfDoom />}>
-              <Register />
-            </Suspense>
-          }
-        />
+        <Route path="/register" element={<Register />} />
       </Route>
     </>
   )
@@ -63,6 +48,16 @@ export const useThemeStore = create<ThemeState>((set) => ({
   theme: "light",
   switchTheme: () =>
     set((state) => ({ theme: state.theme === "light" ? "dark" : "light" })),
+}));
+
+interface ChartState {
+  trigger: boolean;
+  handleTrigger: () => void;
+}
+
+export const useChartStore = create<ChartState>((set) => ({
+  trigger: false,
+  handleTrigger: () => set((state) => ({ trigger: !state.trigger })),
 }));
 
 declare module "@mui/material/styles" {

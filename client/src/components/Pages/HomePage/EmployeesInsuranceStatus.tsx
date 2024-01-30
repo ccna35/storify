@@ -1,4 +1,89 @@
 import { Box, Stack, Tooltip, Typography } from "@mui/material";
+import CardHeader from "./Cards/CardHeader";
+import { DashboardService } from "../../../api/dashboard";
+import BasicModal from "../../Modals/Modal";
+import { useState } from "react";
+
+type StatusBarProps = {
+  tooltip: string;
+  totalCount: number;
+  status: number;
+  backgroundColor: string;
+};
+
+const StatusBar = ({
+  tooltip,
+  totalCount,
+  status,
+  backgroundColor,
+}: StatusBarProps) => {
+  const columns = [
+    {
+      field: "EmpCode",
+      headerName: "EmpCode",
+      width: 90,
+      type: "string",
+    },
+    {
+      field: "EmpName",
+      headerName: "EmpName",
+      width: 90,
+      type: "string",
+    },
+    {
+      field: "EmpNameEn",
+      headerName: "EmpNameEn",
+      width: 90,
+      type: "string",
+    },
+    {
+      field: "EmpTitle",
+      headerName: "EmpTitle",
+      width: 90,
+      type: "string",
+    },
+  ];
+
+  // Handle modal logic
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <>
+      <Stack
+        component={"div"}
+        direction={"row"}
+        spacing={4}
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        onClick={handleOpen}
+        sx={{ cursor: "pointer" }}
+      >
+        <Tooltip title={tooltip} arrow placement="top">
+          <Box
+            sx={{
+              width: (status / totalCount) * 100 + "%",
+              height: 10,
+              backgroundColor,
+              borderRadius: "999px",
+            }}
+          ></Box>
+        </Tooltip>
+        <Typography color="grey">{status}</Typography>
+      </Stack>
+      <BasicModal
+        open={open}
+        handleClose={handleClose}
+        columns={columns}
+        gridId="EmpCode"
+        queryFn={() => DashboardService.getEmployees(tooltip.replace(" ", ""))}
+      />
+    </>
+  );
+};
 
 type InsuranceStatusProps = {
   title: string;
@@ -25,44 +110,20 @@ const InsuranceStatus = ({
       }}
     >
       <Typography fontWeight={500}>{title}</Typography>
-      <Stack spacing={1} flexGrow={1}>
-        <Stack
-          direction={"row"}
-          spacing={4}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-        >
-          <Tooltip title={tooltip} arrow placement="top">
-            <Box
-              sx={{
-                width: (goodStatus / totalCount) * 100 + "%",
-                height: 10,
-                backgroundColor: "#01DE9C",
-                borderRadius: "999px",
-              }}
-            ></Box>
-          </Tooltip>
-          <Typography color="grey">{goodStatus}</Typography>
-        </Stack>
 
-        <Stack
-          direction={"row"}
-          spacing={4}
-          alignItems={"center"}
-          justifyContent={"space-between"}
-        >
-          <Tooltip title={"Not " + tooltip} arrow placement="top">
-            <Box
-              sx={{
-                width: (badStatus / totalCount) * 100 + "%",
-                height: 10,
-                backgroundColor: "#FF6868",
-                borderRadius: "999px",
-              }}
-            ></Box>
-          </Tooltip>
-          <Typography color="grey">{badStatus}</Typography>
-        </Stack>
+      <Stack spacing={1} flexGrow={1}>
+        <StatusBar
+          tooltip={tooltip}
+          status={goodStatus}
+          totalCount={totalCount}
+          backgroundColor="#01DE9C"
+        />
+        <StatusBar
+          tooltip={"Not " + tooltip}
+          status={badStatus}
+          totalCount={totalCount}
+          backgroundColor="#FF6868"
+        />
       </Stack>
     </Box>
   );
@@ -87,7 +148,6 @@ const EmployeesInsuranceStatus = ({ data }: EmployeesInsuranceStatusProps) => {
     <Box
       component={"article"}
       sx={{
-        // maxWidth: 400,
         backgroundColor: "white",
         p: 2,
         border: "1px solid lighgrey",
@@ -96,9 +156,7 @@ const EmployeesInsuranceStatus = ({ data }: EmployeesInsuranceStatusProps) => {
         borderRadius: "10px",
       }}
     >
-      <Typography variant="h6" color="#1790FF" textAlign={"center"} mb={3}>
-        Employees Insurance Status
-      </Typography>
+      <CardHeader title="Employees Insurance Status" />
       <Stack spacing={3}>
         <InsuranceStatus
           title="Social"

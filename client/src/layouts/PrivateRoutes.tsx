@@ -5,7 +5,9 @@ import { UserContext } from "../hooks/UserContext";
 const PrivateRoutes = () => {
   const { user } = useContext(UserContext);
 
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  return <Outlet />;
+
+  // return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
 export default PrivateRoutes;

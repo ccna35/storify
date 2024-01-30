@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ReactApexChart from "react-apexcharts";
 import BasicModal from "../../../Modals/Modal";
+import { useChartStore } from "../../../../App";
 
 type DemoPieChartProps = {
   title: string;
@@ -131,7 +132,12 @@ const DemoPieChart = ({
 
   return (
     <>
-      <ReactApexChart options={options} series={series} type={type} />
+      <ReactApexChart
+        options={options}
+        series={series}
+        type={type}
+        width={"100%"}
+      />
       <BasicModal open={open} handleClose={handleClose} status={status} />
     </>
   );

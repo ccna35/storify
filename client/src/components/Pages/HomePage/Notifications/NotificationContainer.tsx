@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import ExpiryNotification from "./ExpiryNotification";
-import { Box, Divider, Stack, Tab } from "@mui/material";
+import { Box, Divider, Stack, Tab, Typography } from "@mui/material";
 import SimpleNotification from "./SimpleNotification";
 import BasicDateCalendar from "../BasicDatePicker";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
@@ -25,6 +25,7 @@ const NotificationsContainer = ({ data }: NotificationsContainerProps) => {
         direction={"column"}
         alignItems={"stretch"}
         justifyContent={"space-between"}
+        spacing={2}
         sx={{
           boxShadow:
             "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
@@ -167,7 +168,7 @@ const NotificationsContainer = ({ data }: NotificationsContainerProps) => {
         </TabContext>
       </Box>
 
-      <BasicDateCalendar />
+      {/* <BasicDateCalendar /> */}
     </Stack>
   );
 };

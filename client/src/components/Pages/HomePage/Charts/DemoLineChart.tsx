@@ -28,15 +28,6 @@ const DemoLineChart = ({ series, xaxis, title }: DemoLineChartProps) => {
     stroke: {
       curve: "smooth",
     },
-    // fill: {
-    //   type: "gradient",
-    //   gradient: {
-    //     shadeIntensity: 1,
-    //     opacityFrom: 0.7,
-    //     opacityTo: 0.9,
-    //     stops: [0, 90, 100],
-    //   },
-    // },
     dataLabels: {
       enabled: false,
     },

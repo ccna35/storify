@@ -6,7 +6,7 @@ const BasicBreadcrumbs = () => {
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   return (
-    <Breadcrumbs separator="›" aria-label="breadcrumb" sx={{ mb: 5 }}>
+    <Breadcrumbs separator="›" aria-label="breadcrumb">
       <Link component={RouterLink} underline="hover" color="inherit" to="/">
         Dashboard
       </Link>

@@ -1,4 +1,5 @@
 import { Box, Stack, Tooltip, Typography } from "@mui/material";
+import CardHeader from "./Cards/CardHeader";
 
 const barColors = [
   "#ffba08",
@@ -14,36 +15,59 @@ type SingleBarProps = {
   count: number;
   percentage: number;
   index: number;
+  showTitle?: boolean;
 };
 
-const SingleBar = ({ title, count, percentage, index }: SingleBarProps) => {
+const SingleBar = ({
+  title,
+  count,
+  percentage,
+  index,
+  showTitle,
+}: SingleBarProps) => {
   return (
     <Box
       sx={{
         display: "grid",
         alignItems: "center",
         gap: 4,
-        gridTemplateColumns: "2fr 3fr",
+        gridTemplateColumns: showTitle ? "2fr 3fr" : "1fr",
       }}
     >
-      <Typography color="grey">{title}</Typography>
+      {showTitle && <Typography color="grey">{title}</Typography>}
       <Stack spacing={1} flexGrow={1}>
-        <Stack
-          direction={"row"}
-          spacing={2}
-          alignItems={"center"}
-          justifyContent={"space-between"}
+        <Box
+          sx={{
+            display: "grid",
+            flexGrow: 1,
+            alignItems: "center",
+            gap: 4,
+            gridTemplateColumns: "1fr 25px",
+          }}
         >
-          <Box
-            sx={{
-              width: percentage + "%",
-              height: 10,
-              backgroundColor: barColors[index],
-              borderRadius: "999px",
-            }}
-          ></Box>
-          <Typography color="grey">{count}</Typography>
-        </Stack>
+          <Tooltip title={title} arrow placement="top" sx={{ flexGrow: 1 }}>
+            <Box
+              sx={{
+                width: "100%",
+                height: 10,
+                backgroundColor: "#FAFAFB",
+                borderRadius: "999px",
+              }}
+            >
+              <Box
+                sx={{
+                  width: percentage + "%",
+                  height: 10,
+                  backgroundColor: barColors[index],
+                  borderRadius: "999px",
+                }}
+              ></Box>
+            </Box>
+          </Tooltip>
+          <Typography color="grey" textAlign={"right"}>
+            {count}
+          </Typography>
+        </Box>
       </Stack>
     </Box>
   );
@@ -68,9 +92,8 @@ const BarComponent = ({ data, barTitle, chartTitle }: BarComponentProps) => {
         borderRadius: "10px",
       }}
     >
-      <Typography variant="h6" color="#1790FF" textAlign={"center"} mb={3}>
-        {chartTitle}
-      </Typography>
+      <CardHeader title={chartTitle} />
+
       <Stack spacing={1}>
         {data.map((order, index) => {
           return (

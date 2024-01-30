@@ -17,10 +17,21 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { UserProvider } from "../../hooks/UserContext";
 import { Outlet } from "react-router-dom";
-import { Collapse, Link, Stack } from "@mui/material";
+import {
+  Button,
+  Collapse,
+  Link,
+  Menu,
+  MenuItem,
+  Popover,
+  Stack,
+  Tooltip,
+  TooltipProps,
+  tooltipClasses,
+} from "@mui/material";
 import NotificationsContainer from "../Pages/HomePage/Notifications/NotificationContainer";
 import { useQuery } from "@tanstack/react-query";
 import { DashboardService } from "../../api/dashboard";
@@ -32,7 +43,15 @@ import InsuranceContainer from "../Pages/HomePage/InsuranceContainer";
 import StackedBarsContainer from "../Pages/HomePage/StackedBar/StackedBarsContainer";
 import { GridColDef } from "@mui/x-data-grid";
 import { Link as RouterLink } from "react-router-dom";
-import { ExpandLess, ExpandMore, StarBorder } from "@mui/icons-material";
+import {
+  ExpandLess,
+  ExpandMore,
+  Settings,
+  StarBorder,
+} from "@mui/icons-material";
+import BasicBreadcrumbs from "../Navbar/Breadcrumbs";
+import SpinnerOfDoom from "../Spinners/SpinnerOfDoom";
+import NotificationsPanel from "../Notifications/Notifications";
 
 const drawerWidth = 240;
 
@@ -109,144 +128,59 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-const SimpleDataGridWithHeadline = withHeadline(
-  SimpleDataGrid,
-  "Pending Work Orders"
-);
-
 export default function DemoLayout() {
-  const columns: GridColDef[] = useMemo(
-    () => [
-      {
-        field: "idWorkOrder",
-        headerName: "idWorkOrder",
-        width: 90,
-        type: "number",
-      },
-      {
-        field: "WorkOrderNo",
-        headerName: "WorkOrderNo",
-        width: 150,
-        type: "string",
-        renderCell: ({ value }) => {
-          return (
-            <Link component={RouterLink} to={`/workOrders/${value}`}>
-              {value}
-            </Link>
-          );
-        },
-      },
-      {
-        field: "GovernoratesName",
-        headerName: "GovernoratesName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "WorkOrderDate",
-        headerName: "Creation Date",
-        width: 90,
-        type: "date",
-        valueGetter: ({ value }) => value && new Date(value),
-      },
-      {
-        field: "LastUpdateDate",
-        headerName: "LastUpdateDate",
-        width: 90,
-        type: "date",
-        valueGetter: ({ value }) => value && new Date(value),
-      },
-      {
-        field: "ActionDate",
-        headerName: "ActionDate",
-        width: 90,
-        type: "date",
-        valueGetter: ({ value }) => value && new Date(value),
-      },
-      {
-        field: "TeamLeadersName",
-        headerName: "TeamLeadersName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SiteType",
-        headerName: "SiteType",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "CompanyProjectsName",
-        headerName: "CompanyProjectsName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SubProjectsName",
-        headerName: "SubProjectsName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SiteName",
-        headerName: "Site Name",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SiteCode",
-        headerName: "Site Code",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "ERPUserNickName",
-        headerName: "Created By",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "ActionID",
-        headerName: "ActionID",
-        width: 90,
-        type: "number",
-      },
-      {
-        field: "WorkOrderStatus",
-        headerName: "WorkOrderStatus",
-        width: 90,
-        type: "string",
-      },
-    ],
-    []
-  );
-
-  const theme = useTheme();
-  const [open, setOpen] = useState(true);
+  // Left Drawer logic
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setIsDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setOpen(false);
+    setDropDownStatus(false);
+    setIsDrawerOpen(false);
   };
 
+  // Notifications Panel logic
+  const [notificationsPanelState, setNotificationsPanelState] = useState(false);
+
+  const openNotificationsPanel = () => {
+    setNotificationsPanelState(true);
+  };
+
+  const closeNotificationsPanel = () => {
+    setNotificationsPanelState(false);
+  };
+
+  // Dropdown logic
   const [dropDownStatus, setDropDownStatus] = useState(true);
 
   const handleDropDownClick = () => {
-    console.log("Clicked");
-
-    setDropDownStatus(!dropDownStatus);
+    if (isDrawerOpen) setDropDownStatus(!dropDownStatus);
   };
+
+  const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+  ))({
+    [`& .${tooltipClasses.tooltip}`]: {
+      background: "white",
+      color: "grey",
+      boxShadow:
+        "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+      borderRadius: "10px",
+    },
+    [`& .${tooltipClasses.arrow}`]: {
+      color: "white",
+    },
+  });
 
   return (
     <UserProvider>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
-        <AppBar position="fixed" open={open} sx={{ boxShadow: "none" }}>
+        <AppBar position="fixed" open={isDrawerOpen} sx={{ boxShadow: "none" }}>
           <Toolbar>
-            {open ? (
+            {isDrawerOpen ? (
               <IconButton
                 color="info"
                 aria-label="open drawer"
@@ -264,26 +198,27 @@ export default function DemoLayout() {
                 color="info"
                 aria-label="open drawer"
                 onClick={handleDrawerOpen}
-                // edge="start"
-                sx={
-                  {
-                    //   marginRight: 5,
-                    //   ...(open && { display: "none" }),
-                  }
-                }
               >
                 <MenuIcon />
               </IconButton>
             )}
-            {/* <Typography variant="h6" noWrap component="div">
-              Mini variant drawer
-            </Typography> */}
+
+            <BasicBreadcrumbs />
+            {/* <IconButton
+              color="info"
+              aria-label="open notifications panel"
+              onClick={handleDrawerOpen}
+              sx={{ ml: "auto" }}
+            >
+              <Settings />
+            </IconButton> */}
+            <NotificationsPanel />
           </Toolbar>
         </AppBar>
-        <Drawer variant="permanent" open={open}>
+        <Drawer variant="permanent" open={isDrawerOpen}>
           <DrawerHeader>
             <Stack direction={"row"} alignItems={"center"} spacing={1}>
-              {open ? (
+              {isDrawerOpen ? (
                 <Box sx={{ width: "100%" }}>
                   <img src="./genilogo.png" alt="" style={{ width: "100%" }} />
                 </Box>
@@ -300,43 +235,112 @@ export default function DemoLayout() {
           </DrawerHeader>
           {/* <Divider /> */}
           <List>
-            {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
+            {["Home", "Products"].map((text, index) => (
               <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                <ListItemButton
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? "initial" : "center",
-                    px: 2.5,
-                  }}
+                <Link
+                  component={RouterLink}
+                  to={text === "Home" ? "/" : "/products"}
+                  underline="none"
                 >
-                  <ListItemIcon
+                  <ListItemButton
                     sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
+                      minHeight: 48,
+                      justifyContent: isDrawerOpen ? "initial" : "center",
+                      px: 2.5,
                     }}
                   >
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: isDrawerOpen ? 3 : "auto",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={text}
+                      sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+                    />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             ))}
-            <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
-              <ListItemIcon>
-                <InboxIcon />
-              </ListItemIcon>
-              <ListItemText primary="Inbox" />
-              {dropDownStatus ? <ExpandLess /> : <ExpandMore />}
-            </ListItemButton>
+
+            {!isDrawerOpen && (
+              <CustomWidthTooltip
+                title={
+                  <Stack spacing={1}>
+                    {["Home", "Products"].map((text, index) => (
+                      <Link
+                        key={text}
+                        component={RouterLink}
+                        to={text === "Home" ? "/" : "/products"}
+                        underline="none"
+                        sx={{
+                          px: 2,
+                          py: 1,
+                          borderRadius: 1,
+                          color: "grey",
+                          "&:hover": {
+                            backgroundColor: "rgba(0, 0, 0, 0.04)",
+                          },
+                        }}
+                      >
+                        <Typography>{text}</Typography>
+                      </Link>
+                    ))}
+                  </Stack>
+                }
+                placement="right"
+                // leaveDelay={500000000}
+                arrow
+              >
+                <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
+                  <ListItemIcon>
+                    <InboxIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Inbox" />
+                  {dropDownStatus ? <ExpandLess /> : <ExpandMore />}
+                </ListItemButton>
+              </CustomWidthTooltip>
+            )}
+            {isDrawerOpen && (
+              <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
+                <ListItemIcon>
+                  <InboxIcon />
+                </ListItemIcon>
+                <ListItemText primary="Inbox" />
+                {dropDownStatus ? <ExpandLess /> : <ExpandMore />}
+              </ListItemButton>
+            )}
             <Collapse in={dropDownStatus} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
-                <ListItemButton sx={{ pl: 4 }}>
-                  <ListItemIcon>
-                    <StarBorder />
-                  </ListItemIcon>
-                  <ListItemText primary="Starred" />
-                </ListItemButton>
+                {["Home", "Products"].map((text, index) => (
+                  <ListItem key={text} disablePadding sx={{ display: "block" }}>
+                    <Link
+                      component={RouterLink}
+                      to={text === "Home" ? "/" : "/products"}
+                      underline="none"
+                    >
+                      <ListItemButton sx={{ pl: 4 }}>
+                        <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: isDrawerOpen ? 3 : "auto",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={text}
+                          sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+                        />
+                      </ListItemButton>
+                    </Link>
+                  </ListItem>
+                ))}
               </List>
             </Collapse>
           </List>
@@ -344,34 +348,50 @@ export default function DemoLayout() {
           <List>
             {["All mail", "Trash", "Spam"].map((text, index) => (
               <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                <ListItemButton
-                  sx={{
-                    minHeight: 48,
-                    justifyContent: open ? "initial" : "center",
-                    px: 2.5,
-                  }}
+                <Link
+                  component={RouterLink}
+                  to={text === "Spam" ? "/spam" : "/"}
+                  underline="none"
                 >
-                  <ListItemIcon
+                  <ListItemButton
                     sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
+                      minHeight: 48,
+                      justifyContent: isDrawerOpen ? "initial" : "center",
+                      px: 2.5,
                     }}
                   >
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        mr: isDrawerOpen ? 3 : "auto",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={text}
+                      sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+                    />
+                  </ListItemButton>
+                </Link>
               </ListItem>
             ))}
           </List>
         </Drawer>
         <Box
           component="main"
-          sx={{ flexGrow: 1, p: 3, backgroundColor: "#FAFAFB" }}
+          sx={{
+            width: "100%",
+            flexGrow: 1,
+            p: 3,
+            backgroundColor: "#FAFAFB",
+          }}
         >
           <DrawerHeader />
-          <Outlet />
+          <Suspense fallback={<SpinnerOfDoom />}>
+            <Outlet />
+          </Suspense>
         </Box>
       </Box>
     </UserProvider>

@@ -1,3 +1,4 @@
+import Spam from "./components/Pages/Spam/Spam";
 import { HomePage, Profile, Settings } from "./pages";
 import EmployeeStatus from "./pages/EmployeeStatus";
 import NewProduct from "./pages/NewProduct";
@@ -27,6 +28,10 @@ export const PRIVATE_ROUTES = [
   {
     path: "/new-product",
     element: <NewProduct />,
+  },
+  {
+    path: "/spam",
+    element: <Spam />,
   },
 ];
 

@@ -39,14 +39,7 @@ const ExpiryNotification = ({
   type,
 }: ExpiryNotificationProps) => {
   return (
-    <Box
-    // sx={{
-    //   boxShadow:
-    //     "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
-    //   borderRadius: "10px",
-    //   padding: 2,
-    // }}
-    >
+    <Box>
       <Stack
         direction={"row"}
         spacing={1}
@@ -94,7 +87,9 @@ const NotificationElement = ({ count, type }: NotificationElementProps) => {
           {type}
         </Typography>
       </Stack>
-      <Typography fontWeight={500}>{count}</Typography>
+      <Typography fontSize={14} color="grey">
+        {count}
+      </Typography>
     </Stack>
   );
 };

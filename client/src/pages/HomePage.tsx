@@ -1,4 +1,4 @@
-import { Box, Divider, Stack, Typography, Link } from "@mui/material";
+import { Box, Divider, Stack, Typography, Link, Grid } from "@mui/material";
 import DemoBarChart from "../components/Pages/HomePage/Charts/DemoBarChart";
 import SimpleDataGrid from "../components/Pages/HomePage/DataGrids/SimpleDataGrid";
 import { useQuery } from "@tanstack/react-query";
@@ -15,6 +15,8 @@ import withHeadline from "../components/Pages/HomePage/withHeadline";
 import EmployeesInsuranceStatus from "../components/Pages/HomePage/EmployeesInsuranceStatus";
 import BarComponent from "../components/Pages/HomePage/BarComponent";
 import DemoLineChart from "../components/Pages/HomePage/Charts/DemoLineChart";
+import CardHeader from "../components/Pages/HomePage/Cards/CardHeader";
+import PendingWorkOrders from "../components/Pages/HomePage/Cards/PendingWorkOrders";
 
 const SimpleDataGridWithHeadline = withHeadline(
   SimpleDataGrid,
@@ -22,113 +24,7 @@ const SimpleDataGridWithHeadline = withHeadline(
 );
 
 const HomePage = () => {
-  const columns: GridColDef[] = useMemo(
-    () => [
-      {
-        field: "idWorkOrder",
-        headerName: "idWorkOrder",
-        width: 90,
-        type: "number",
-      },
-      {
-        field: "WorkOrderNo",
-        headerName: "WorkOrderNo",
-        width: 150,
-        type: "string",
-        renderCell: ({ value }) => {
-          return (
-            <Link component={RouterLink} to={`/workOrders/${value}`}>
-              {value}
-            </Link>
-          );
-        },
-      },
-      {
-        field: "GovernoratesName",
-        headerName: "GovernoratesName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "WorkOrderDate",
-        headerName: "Creation Date",
-        width: 90,
-        type: "date",
-        valueGetter: ({ value }) => value && new Date(value),
-      },
-      {
-        field: "LastUpdateDate",
-        headerName: "LastUpdateDate",
-        width: 90,
-        type: "date",
-        valueGetter: ({ value }) => value && new Date(value),
-      },
-      {
-        field: "ActionDate",
-        headerName: "ActionDate",
-        width: 90,
-        type: "date",
-        valueGetter: ({ value }) => value && new Date(value),
-      },
-      {
-        field: "TeamLeadersName",
-        headerName: "TeamLeadersName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SiteType",
-        headerName: "SiteType",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "CompanyProjectsName",
-        headerName: "CompanyProjectsName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SubProjectsName",
-        headerName: "SubProjectsName",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SiteName",
-        headerName: "Site Name",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "SiteCode",
-        headerName: "Site Code",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "ERPUserNickName",
-        headerName: "Created By",
-        width: 90,
-        type: "string",
-      },
-      {
-        field: "ActionID",
-        headerName: "ActionID",
-        width: 90,
-        type: "number",
-      },
-      {
-        field: "WorkOrderStatus",
-        headerName: "WorkOrderStatus",
-        width: 90,
-        type: "string",
-      },
-    ],
-    []
-  );
-
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isSuccess } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => DashboardService.getDashboard(),
   });
@@ -140,54 +36,80 @@ const HomePage = () => {
   // );
 
   return (
-    <Stack direction="column" spacing={4} sx={{ width: "100%" }}>
-      <Typography variant="h5" component={"h1"} fontWeight={500}>
-        Hi, Welcome back 👋
-      </Typography>
-
+    <>
       {isLoading ? (
         <SpinnerOfDoom />
       ) : (
-        <>
-          <NotificationsContainer data={data} />
-          <Divider
-            variant="fullWidth"
-            orientation="horizontal"
-            sx={{
-              borderStyle: "dashed",
-            }}
-          />
-          <Box
-            sx={{
-              display: "grid",
-              // flexDirection: "row",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: 3,
-              // justifyContent: "space-between",
-              alignItems: "flex-start",
-            }}
-          >
-            <EmployeesInsuranceStatus data={data} />
+        <Grid container rowSpacing={4.5} columnSpacing={2.75}>
+          <Grid item xs={12}>
+            <NotificationsContainer data={data} />
+          </Grid>
 
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <EmployeesInsuranceStatus data={data} />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
             <BarComponent
               data={data.AllWorkOrderStatusThisYear}
               barTitle="WorkOrderStatus"
               chartTitle="Work Orders By Status"
             />
-
+          </Grid>
+          <Grid item xs={12} sm={6} md={4} lg={3}>
             <BarComponent
               data={data.AllQuotationStatusThisYear}
               barTitle="WorkOrderD6Status"
               chartTitle="Pending Quotation Status"
             />
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 3,
-            }}
-          >
+          </Grid>
+
+          <Grid item xs={12} sm={6} md={4} lg={3}>
+            <PendingWorkOrders data={data} />
+            {/* <Stack
+            component={"article"}
+              spacing={2}
+              justifyContent={"center"}
+              alignItems={"center"}
+              sx={{
+                boxShadow:
+                  "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+                borderRadius: "10px",
+                padding: 2,
+                backgroundColor: "#fff",
+              }}
+            >
+              <CardHeader title="Pending Work Orders" />
+              <Stack direction={"row"} spacing={4}>
+                <Stack spacing={1} alignItems={"center"}>
+                  <Typography variant="h2" fontWeight={500} color="#01DE9C">
+                    {
+                      data.WorkOrdersPending.filter((order) =>
+                        order.WorkOrderDate.includes("2024")
+                      ).length
+                    }
+                  </Typography>
+                  <Typography variant="body1" color="#01DE9C">
+                    2024
+                  </Typography>
+                </Stack>
+                <Stack spacing={1} alignItems={"center"}>
+                  <Typography variant="h2" fontWeight={500} color="#FFBA08">
+                    {
+                      data.WorkOrdersPending.filter((order) =>
+                        order.WorkOrderDate.includes("2023")
+                      ).length
+                    }
+                  </Typography>
+                  <Typography variant="body1" color="#FFBA08">
+                    2023
+                  </Typography>
+                </Stack>
+              </Stack>
+            </Stack> */}
+          </Grid>
+
+          {/* Work orders received ------ Work orders in progress */}
+          <Grid item xs={12} sm={6}>
             <Box
               flex={1}
               sx={{
@@ -218,7 +140,8 @@ const HomePage = () => {
                 ]}
               />
             </Box>
-
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <Box
               flex={1}
               sx={{
@@ -229,7 +152,6 @@ const HomePage = () => {
               }}
             >
               <DemoPieChart
-                // type="pie"
                 title="Work orders in progress"
                 labels={data.AllWorkOrdersInProgressPerProject.map(
                   (order) => order.CompanyProjectsName
@@ -239,14 +161,10 @@ const HomePage = () => {
                 )}
               />
             </Box>
-          </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 3,
-            }}
-          >
+          </Grid>
+
+          {/* Work Orders Per Project -------- Quotation Approved */}
+          <Grid item xs={12} sm={6}>
             <Box
               flex={1}
               sx={{
@@ -279,7 +197,8 @@ const HomePage = () => {
                 ]}
               />
             </Box>
-
+          </Grid>
+          <Grid item xs={12} sm={6}>
             <Box
               flex={1}
               sx={{
@@ -312,22 +231,17 @@ const HomePage = () => {
                 ]}
               />
             </Box>
-          </Box>
+          </Grid>
 
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 3,
-            }}
-          >
+          {/* Open missions ------ Completed work without acceptance */}
+          <Grid item xs={12} sm={6}>
             <Box
               flex={1}
               sx={{
                 boxShadow:
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
-                padding: 2,
+                padding: 1,
               }}
             >
               <DemoPieChart
@@ -340,32 +254,18 @@ const HomePage = () => {
                 )}
               />
             </Box>
+          </Grid>
+
+          <Grid item xs={12} sm={6}>
             <Box
               flex={1}
               sx={{
                 boxShadow:
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
-                padding: 2,
+                padding: 1,
               }}
             >
-              {/* <DemoBarChart
-                // horizontal
-                title="Completed work without acceptance"
-                xaxis={{
-                  categories: data.WorkOrdersAndWaitingApprovalPerProject.map(
-                    (order) => order.CompanyProjectsName
-                  ),
-                }}
-                series={[
-                  {
-                    data: data.WorkOrdersAndWaitingApprovalPerProject.map(
-                      (order) => order.Count
-                    ),
-                    name: "2023",
-                  },
-                ]}
-              /> */}
               <DemoLineChart
                 title="Completed work without acceptance"
                 xaxis={{
@@ -383,28 +283,28 @@ const HomePage = () => {
                 ]}
               />
             </Box>
-          </Box>
-          <SimpleDataGridWithHeadline
-            rows={data.WorkOrdersPending}
-            columns={columns}
-            id="idWorkOrder"
-            columnVisibilityModel={{
-              idWorkOrder: false,
-              LastUpdateDate: false,
-              ActionDate: false,
-              ActionID: false,
-              GovernoratesName: false,
-              SubProjectsName: false,
-              SiteType: false,
-              CompanyProjectsName: false,
-              WorkOrderStatus: false,
-            }}
-          />
-          {/* <InsuranceContainer data={data} /> */}
-          {/* <StackedBarsContainer data={data} /> */}
-        </>
+          </Grid>
+          {/* <Grid item xs={12} sm={6}>
+            <SimpleDataGridWithHeadline
+              rows={data.WorkOrdersPending}
+              columns={columns}
+              id="idWorkOrder"
+              columnVisibilityModel={{
+                idWorkOrder: false,
+                LastUpdateDate: false,
+                ActionDate: false,
+                ActionID: false,
+                GovernoratesName: false,
+                SubProjectsName: false,
+                SiteType: false,
+                CompanyProjectsName: false,
+                WorkOrderStatus: false,
+              }}
+            />
+          </Grid> */}
+        </Grid>
       )}
-    </Stack>
+    </>
   );
 };
 
