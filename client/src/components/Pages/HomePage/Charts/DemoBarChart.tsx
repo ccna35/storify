@@ -76,6 +76,7 @@ const DemoBarChart = ({
     chart: {
       type: "bar",
       height: 430,
+      width: "400px",
     },
     plotOptions: {
       bar: {

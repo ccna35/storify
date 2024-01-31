@@ -117,6 +117,7 @@ const HomePage = () => {
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
                 padding: 2,
+                width: "100%",
               }}
             >
               <DemoBarChart
@@ -172,6 +173,7 @@ const HomePage = () => {
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
                 padding: 2,
+                width: "100%",
               }}
             >
               <DemoBarChart
@@ -206,6 +208,7 @@ const HomePage = () => {
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
                 padding: 1,
+                width: "100%",
               }}
             >
               <DemoBarChart

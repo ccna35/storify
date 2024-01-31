@@ -32,18 +32,9 @@ import {
   TooltipProps,
   tooltipClasses,
 } from "@mui/material";
-import NotificationsContainer from "../Pages/HomePage/Notifications/NotificationContainer";
-import { useQuery } from "@tanstack/react-query";
-import { DashboardService } from "../../api/dashboard";
-import withHeadline from "../Pages/HomePage/withHeadline";
-import SimpleDataGrid from "../Pages/HomePage/DataGrids/SimpleDataGrid";
-import DemoBarChart from "../Pages/HomePage/Charts/DemoBarChart";
-import DemoPieChart from "../Pages/HomePage/PieCharts/DemoPieChart";
-import InsuranceContainer from "../Pages/HomePage/InsuranceContainer";
-import StackedBarsContainer from "../Pages/HomePage/StackedBar/StackedBarsContainer";
-import { GridColDef } from "@mui/x-data-grid";
 import { Link as RouterLink } from "react-router-dom";
 import {
+  Add,
   ExpandLess,
   ExpandMore,
   Settings,
@@ -52,6 +43,7 @@ import {
 import BasicBreadcrumbs from "../Navbar/Breadcrumbs";
 import SpinnerOfDoom from "../Spinners/SpinnerOfDoom";
 import NotificationsPanel from "../Notifications/Notifications";
+import DropDown from "./DropDown";
 
 const drawerWidth = 240;
 
@@ -132,47 +124,40 @@ export default function DemoLayout() {
   // Left Drawer logic
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
+  // Left Drawer logic
+  const [dropDownsState, setDropDownsState] = useState(true);
+
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setDropDownStatus(false);
+    setDropDownsState(false);
     setIsDrawerOpen(false);
   };
 
-  // Notifications Panel logic
-  const [notificationsPanelState, setNotificationsPanelState] = useState(false);
-
-  const openNotificationsPanel = () => {
-    setNotificationsPanelState(true);
-  };
-
-  const closeNotificationsPanel = () => {
-    setNotificationsPanelState(false);
-  };
-
   // Dropdown logic
-  const [dropDownStatus, setDropDownStatus] = useState(true);
+  // const [dropDownStatus, setDropDownStatus] = useState(true);
 
-  const handleDropDownClick = () => {
-    if (isDrawerOpen) setDropDownStatus(!dropDownStatus);
-  };
+  // const handleDropDownClick = () => {
+  //   if (isDrawerOpen) setDropDownStatus(!dropDownStatus);
+  // };
 
-  const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-  ))({
-    [`& .${tooltipClasses.tooltip}`]: {
-      background: "white",
-      color: "grey",
-      boxShadow:
-        "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
-      borderRadius: "10px",
-    },
-    [`& .${tooltipClasses.arrow}`]: {
-      color: "white",
-    },
-  });
+  // const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+  //   <Tooltip {...props} classes={{ popper: className }} />
+  // ))({
+  //   [`& .${tooltipClasses.tooltip}`]: {
+  //     background: "white",
+  //     color: "grey",
+  //     boxShadow:
+  //       "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+  //     borderRadius: "10px",
+  //     width: 200,
+  //   },
+  //   [`& .${tooltipClasses.arrow}`]: {
+  //     color: "white",
+  //   },
+  // });
 
   return (
     <UserProvider>
@@ -204,15 +189,7 @@ export default function DemoLayout() {
             )}
 
             <BasicBreadcrumbs />
-            {/* <IconButton
-              color="info"
-              aria-label="open notifications panel"
-              onClick={handleDrawerOpen}
-              sx={{ ml: "auto" }}
-            >
-              <Settings />
-            </IconButton> */}
-            <NotificationsPanel />
+            <NotificationsPanel enableAnimations />
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={isDrawerOpen}>
@@ -233,7 +210,6 @@ export default function DemoLayout() {
               )}
             </Stack>
           </DrawerHeader>
-          {/* <Divider /> */}
           <List>
             {["Home", "Products"].map((text, index) => (
               <ListItem key={text} disablePadding sx={{ display: "block" }}>
@@ -241,12 +217,16 @@ export default function DemoLayout() {
                   component={RouterLink}
                   to={text === "Home" ? "/" : "/products"}
                   underline="none"
+                  sx={{ color: "#262626" }}
                 >
                   <ListItemButton
                     sx={{
                       minHeight: 48,
                       justifyContent: isDrawerOpen ? "initial" : "center",
                       px: 2.5,
+                      "&:hover": {
+                        backgroundColor: "#E6F4FF",
+                      },
                     }}
                   >
                     <ListItemIcon
@@ -267,97 +247,30 @@ export default function DemoLayout() {
               </ListItem>
             ))}
 
-            {!isDrawerOpen && (
-              <CustomWidthTooltip
-                title={
-                  <Stack spacing={1}>
-                    {["Home", "Products"].map((text, index) => (
-                      <Link
-                        key={text}
-                        component={RouterLink}
-                        to={text === "Home" ? "/" : "/products"}
-                        underline="none"
-                        sx={{
-                          px: 2,
-                          py: 1,
-                          borderRadius: 1,
-                          color: "grey",
-                          "&:hover": {
-                            backgroundColor: "rgba(0, 0, 0, 0.04)",
-                          },
-                        }}
-                      >
-                        <Typography>{text}</Typography>
-                      </Link>
-                    ))}
-                  </Stack>
-                }
-                placement="right"
-                // leaveDelay={500000000}
-                arrow
-              >
-                <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
-                  <ListItemIcon>
-                    <InboxIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Inbox" />
-                  {dropDownStatus ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-              </CustomWidthTooltip>
-            )}
-            {isDrawerOpen && (
-              <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
-                <ListItemIcon>
-                  <InboxIcon />
-                </ListItemIcon>
-                <ListItemText primary="Inbox" />
-                {dropDownStatus ? <ExpandLess /> : <ExpandMore />}
-              </ListItemButton>
-            )}
-            <Collapse in={dropDownStatus} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {["Home", "Products"].map((text, index) => (
-                  <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                    <Link
-                      component={RouterLink}
-                      to={text === "Home" ? "/" : "/products"}
-                      underline="none"
-                    >
-                      <ListItemButton sx={{ pl: 4 }}>
-                        <ListItemIcon
-                          sx={{
-                            minWidth: 0,
-                            mr: isDrawerOpen ? 3 : "auto",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={text}
-                          sx={{ opacity: isDrawerOpen ? 1 : 0 }}
-                        />
-                      </ListItemButton>
-                    </Link>
-                  </ListItem>
-                ))}
-              </List>
-            </Collapse>
+            <DropDown
+              isDrawerOpen={isDrawerOpen}
+              menuItems={["Home", "Products"]}
+              dropDownsState={dropDownsState}
+            />
           </List>
           <Divider />
           <List>
-            {["All mail", "Trash", "Spam"].map((text, index) => (
+            {["Home", "Products"].map((text, index) => (
               <ListItem key={text} disablePadding sx={{ display: "block" }}>
                 <Link
                   component={RouterLink}
-                  to={text === "Spam" ? "/spam" : "/"}
+                  to={text === "Home" ? "/" : "/products"}
                   underline="none"
+                  sx={{ color: "#262626" }}
                 >
                   <ListItemButton
                     sx={{
                       minHeight: 48,
                       justifyContent: isDrawerOpen ? "initial" : "center",
                       px: 2.5,
+                      "&:hover": {
+                        backgroundColor: "#E6F4FF",
+                      },
                     }}
                   >
                     <ListItemIcon
@@ -377,6 +290,12 @@ export default function DemoLayout() {
                 </Link>
               </ListItem>
             ))}
+
+            <DropDown
+              isDrawerOpen={isDrawerOpen}
+              menuItems={["Home", "Products"]}
+              dropDownsState={dropDownsState}
+            />
           </List>
         </Drawer>
         <Box

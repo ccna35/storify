@@ -1,26 +1,13 @@
 import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
-import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { useState } from "react";
-import {
-  Avatar,
-  Chip,
-  IconButton,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
-import { Settings } from "@mui/icons-material";
-import { green, grey } from "@mui/material/colors";
+import { Chip, IconButton, Stack, Tab, Tabs, Typography } from "@mui/material";
+import { LockClock, NotificationsTwoTone, Person } from "@mui/icons-material";
+import { useQuery } from "@tanstack/react-query";
+import { DashboardService } from "../../api/dashboard";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -45,52 +32,131 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 type NotificationCardProps = {
-  title: string;
-  time: string;
+  person: string;
+  requestDate: string;
+  description: string;
+  requestNumber: string;
 };
 
-const NotificationCard = ({ title, time }: NotificationCardProps) => {
+const NotificationCard = ({
+  person,
+  requestNumber,
+  requestDate,
+  description,
+}: NotificationCardProps) => {
   return (
-    <Box sx={{ p: 3, borderRadius: 3 }}>
-      <Stack direction={"row"} spacing={2}>
-        <Avatar src="/broken-image.jpg" />
-        <Stack spacing={2}>
-          <Box>
-            <Typography>{title}</Typography>
-            <Typography color={grey[600]} variant="caption">
-              {time}
-            </Typography>
-          </Box>
-          <Stack direction={"row"} spacing={2}>
-            <Button
-              sx={{
-                textTransform: "capitalize",
-                px: 1.5,
-                borderRadius: 3,
-                backgroundColor: "#0085FF",
-                "&:hover": {
-                  backgroundColor: "#0085ffa6",
-                },
-              }}
-              variant="contained"
-            >
-              Approve
-            </Button>
-            <Button
-              color="error"
-              sx={{ textTransform: "capitalize", px: 1.5, borderRadius: 3 }}
-              variant="outlined"
-            >
-              Discard
-            </Button>
-          </Stack>
+    <Box
+      // component={motion.div}
+      sx={{ p: 3, borderRadius: 3 }}
+      // initial={{ opacity: 0, x: 80, scale: 0.3 }}
+      // animate={{ opacity: 1, x: 0, scale: 1 }}
+      // exit={{ opacity: 0, scale: 0.5, transition: { duration: 1 } }}
+    >
+      <Stack spacing={2}>
+        {/* <Avatar src="/broken-image.jpg" /> */}
+        <Stack direction={"row"} spacing={2}>
+          <Chip
+            label={person}
+            color="info"
+            variant="filled"
+            size="small"
+            icon={<Person />}
+            sx={{
+              backgroundColor: "#E3F1FF",
+              color: "#1790FF",
+              py: 1.5,
+              px: 0.5,
+            }}
+          />
+          <Chip
+            label={"#" + requestNumber}
+            color="secondary"
+            variant="filled"
+            size="small"
+            sx={{
+              backgroundColor: "#F3E5FF",
+              color: "#9D4EDD",
+              py: 1.5,
+              px: 0.5,
+            }}
+          />
+          <Chip
+            label={requestDate}
+            color="warning"
+            variant="filled"
+            size="small"
+            sx={{
+              backgroundColor: "#FFEEEE",
+              color: "#FF6868",
+              py: 1.5,
+              px: 0.5,
+            }}
+            icon={<LockClock />}
+          />
+        </Stack>
+        <Typography
+          sx={{
+            p: 2,
+            backgroundColor: "#F3F3F3",
+            color: "#777777",
+            alignSelf: "flex-start",
+            borderRadius: 5,
+            borderTopLeftRadius: 0,
+            fontSize: 14,
+          }}
+        >
+          {description}
+        </Typography>
+        <Stack direction={"row"} spacing={2}>
+          <Button
+            sx={{
+              textTransform: "capitalize",
+              px: 1.5,
+              borderRadius: 3,
+              backgroundColor: "#0085FF",
+              "&:hover": {
+                backgroundColor: "#0085ffa6",
+              },
+            }}
+            variant="contained"
+          >
+            Accept
+          </Button>
+          <Button
+            sx={{
+              textTransform: "capitalize",
+              px: 1.5,
+              borderRadius: 3,
+              backgroundColor: "#FFF3F3",
+              color: "#FF6868",
+              "&:hover": {
+                backgroundColor: "#FFE0E0",
+              },
+            }}
+            variant="contained"
+          >
+            Discard
+          </Button>
         </Stack>
       </Stack>
     </Box>
   );
 };
 
-export default function NotificationsPanel() {
+type NotificationsPanelProps = {
+  enableAnimations?: boolean;
+};
+
+export default function NotificationsPanel({
+  enableAnimations,
+}: NotificationsPanelProps) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: () => DashboardService.getNotifications(),
+    refetchInterval: 10 * 1000,
+  });
+
+  // Notifications Panel logic
   const [notificationsPanelState, setNotificationsPanelState] = useState(false);
 
   const openNotificationsPanel = () => {
@@ -105,15 +171,48 @@ export default function NotificationsPanel() {
     setTabValue(index);
   };
 
+  const notificationsCount =
+    data &&
+    Object.values(data).reduce((totalLength, value) => {
+      if (Array.isArray(value)) {
+        return totalLength + value.length;
+      } else {
+        return totalLength;
+      }
+    }, 0);
+
   return (
     <>
       <IconButton
         color="info"
         aria-label="open notifications panel"
         onClick={openNotificationsPanel}
-        sx={{ ml: "auto" }}
+        sx={{ ml: "auto", position: "relative" }}
       >
-        <Settings />
+        <NotificationsTwoTone />
+        <Box
+          sx={{
+            width: 20,
+            height: 20,
+            backgroundColor: "#FF5E5B",
+            borderRadius: "50%",
+            position: "absolute",
+            top: 0,
+            right: 0,
+            display: "grid",
+            placeItems: "center",
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: 14,
+              fontWeight: 100,
+              color: "white",
+            }}
+          >
+            {data && notificationsCount}
+          </Typography>
+        </Box>
       </IconButton>
       <Drawer
         anchor={"right"}
@@ -128,7 +227,7 @@ export default function NotificationsPanel() {
           },
         }}
       >
-        <Box sx={{ width: 450 }} role="presentation">
+        <Box sx={{ width: 500 }} role="presentation">
           <Typography variant="h6" fontWeight={500} p={2}>
             Notifications
           </Typography>
@@ -136,19 +235,27 @@ export default function NotificationsPanel() {
             value={tabValue}
             onChange={handleTabs}
             aria-label="basic tabs example"
-            sx={{ borderBottom: "1px solid lightgrey", width: "100%" }}
+            sx={{
+              borderBottom: "1px solid lightgrey",
+              width: "100%",
+              position: "sticky",
+              top: 0,
+              backgroundColor: "rgb(255,255,255,.1)",
+              zIndex: 999,
+              backdropFilter: "blur(7px)",
+            }}
           >
             <Tab
               value={0}
               label={
                 <Stack direction={"row"} spacing={1} alignItems={"center"}>
                   <Typography fontWeight={500} textTransform={"capitalize"}>
-                    All
+                    Materials
                   </Typography>
                   <Chip
-                    label={20}
+                    label={data?.materialschangerequests.length}
                     color="default"
-                    variant="filled"
+                    variant={tabValue === 0 ? "filled" : "outlined"}
                     size="small"
                   />
                 </Stack>
@@ -160,24 +267,12 @@ export default function NotificationsPanel() {
               label={
                 <Stack direction={"row"} spacing={1} alignItems={"center"}>
                   <Typography fontWeight={500} textTransform={"capitalize"}>
-                    Unread
-                  </Typography>
-                  <Chip label={20} color="info" variant="filled" size="small" />
-                </Stack>
-              }
-              disableRipple
-            />
-            <Tab
-              value={2}
-              label={
-                <Stack direction={"row"} spacing={1} alignItems={"center"}>
-                  <Typography fontWeight={500} textTransform={"capitalize"}>
-                    Archived
+                    Missions
                   </Typography>
                   <Chip
-                    label={20}
-                    color="warning"
-                    variant="filled"
+                    label={data?.missionschangerequests.length}
+                    color="default"
+                    variant={tabValue === 1 ? "filled" : "outlined"}
                     size="small"
                   />
                 </Stack>
@@ -193,22 +288,51 @@ export default function NotificationsPanel() {
                 />
               }
             >
-              <NotificationCard
-                title="A change request needs your approval"
-                time="28 minutes ago"
-              />
-              <NotificationCard
-                title="5 employees joined the fleet"
-                time="2 days ago"
-              />
-              <NotificationCard
-                title="8 cards need fixing ASAP!"
-                time="5 weeks ago"
-              />
+              {isLoading ? (
+                <Typography>Loading...</Typography>
+              ) : (
+                data?.materialschangerequests.map((card) => (
+                  <NotificationCard
+                    key={card.idMaterialsRequest}
+                    description={card.ChangeRequestDiscription}
+                    requestDate={card.RequestDate}
+                    person={card.ERPUserNickName}
+                    requestNumber={card.MaterialsRequestNo}
+                  />
+                ))
+              )}
             </Stack>
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1}>
-            Item Two
+            <Stack
+              divider={
+                <Divider
+                  sx={{ borderStyle: "dashed", borderColor: "lightgray" }}
+                />
+              }
+            >
+              {isLoading ? (
+                <Typography>Loading...</Typography>
+              ) : data?.missionschangerequests.length === 0 ? (
+                <Box sx={{ p: 3 }}>
+                  <Typography
+                    sx={{ p: 3, borderRadius: 5, backgroundColor: "#F3F3F3" }}
+                  >
+                    Nothing to see here!
+                  </Typography>
+                </Box>
+              ) : (
+                data?.missionschangerequests.map((card) => (
+                  <NotificationCard
+                    key={card.idMissions}
+                    description={card.MissionsChangeRequestDiscription}
+                    requestDate={card.RequestDate}
+                    person={card.ERPUserNickName}
+                    requestNumber={card.MissionNo}
+                  />
+                ))
+              )}
+            </Stack>
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2}>
             Item Three

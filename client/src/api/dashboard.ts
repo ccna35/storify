@@ -16,6 +16,13 @@ const getDashboard = async () => {
   return res.data;
 };
 
+const getNotifications = async () => {
+  const res = await query.get("/NotificationsV2");
+  console.log(res.data);
+
+  return res.data;
+};
+
 const getEmployees = async (status: string) => {
   const res = await query.get("/Get" + status);
   console.log(res.data.NationalIDexpired);
@@ -26,4 +33,5 @@ const getEmployees = async (status: string) => {
 export const DashboardService = {
   getDashboard,
   getEmployees,
+  getNotifications,
 };
