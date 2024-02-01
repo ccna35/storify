@@ -11,7 +11,7 @@ export type Product = {
 };
 
 const getDashboard = async () => {
-  const res = await query.get("/GetDashboard");
+  const res = await query.get("/GetDashboard8");
 
   return res.data;
 };

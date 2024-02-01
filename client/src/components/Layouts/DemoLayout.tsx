@@ -19,7 +19,7 @@ import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
 import { Suspense, useMemo, useState } from "react";
 import { UserProvider } from "../../hooks/UserContext";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import {
   Button,
   Collapse,
@@ -44,6 +44,10 @@ import BasicBreadcrumbs from "../Navbar/Breadcrumbs";
 import SpinnerOfDoom from "../Spinners/SpinnerOfDoom";
 import NotificationsPanel from "../Notifications/Notifications";
 import DropDown from "./DropDown";
+import { useMutation } from "@tanstack/react-query";
+import { ProductService } from "../../api/products";
+import { MissionsService } from "../../api/missions";
+import { ErrorBoundary } from "react-error-boundary";
 
 const drawerWidth = 240;
 
@@ -136,35 +140,24 @@ export default function DemoLayout() {
     setIsDrawerOpen(false);
   };
 
-  // Dropdown logic
-  // const [dropDownStatus, setDropDownStatus] = useState(true);
+  const navigate = useNavigate();
 
-  // const handleDropDownClick = () => {
-  //   if (isDrawerOpen) setDropDownStatus(!dropDownStatus);
-  // };
-
-  // const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
-  //   <Tooltip {...props} classes={{ popper: className }} />
-  // ))({
-  //   [`& .${tooltipClasses.tooltip}`]: {
-  //     background: "white",
-  //     color: "grey",
-  //     boxShadow:
-  //       "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
-  //     borderRadius: "10px",
-  //     width: 200,
-  //   },
-  //   [`& .${tooltipClasses.arrow}`]: {
-  //     color: "white",
-  //   },
-  // });
+  const { mutateAsync: createMission } = useMutation({
+    mutationFn: MissionsService.createMission,
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
   return (
     <UserProvider>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <AppBar position="fixed" open={isDrawerOpen} sx={{ boxShadow: "none" }}>
-          <Toolbar>
+          <Toolbar sx={{ gap: 3 }}>
             {isDrawerOpen ? (
               <IconButton
                 color="info"
@@ -190,6 +183,25 @@ export default function DemoLayout() {
 
             <BasicBreadcrumbs />
             <NotificationsPanel enableAnimations />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                createMission();
+              }}
+            >
+              New Mission
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/login");
+              }}
+            >
+              Sign Out
+            </Button>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={isDrawerOpen}>
@@ -309,7 +321,9 @@ export default function DemoLayout() {
         >
           <DrawerHeader />
           <Suspense fallback={<SpinnerOfDoom />}>
-            <Outlet />
+            <ErrorBoundary fallback={<div>Something went wrong</div>}>
+              <Outlet />
+            </ErrorBoundary>
           </Suspense>
         </Box>
       </Box>

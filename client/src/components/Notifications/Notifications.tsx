@@ -113,7 +113,8 @@ const NotificationCard = ({
               textTransform: "capitalize",
               px: 1.5,
               borderRadius: 3,
-              backgroundColor: "#0085FF",
+              backgroundColor: "primary",
+              color: "white",
               "&:hover": {
                 backgroundColor: "#0085ffa6",
               },
@@ -242,7 +243,7 @@ export default function NotificationsPanel({
               top: 0,
               backgroundColor: "rgb(255,255,255,.1)",
               zIndex: 999,
-              backdropFilter: "blur(7px)",
+              backdropFilter: "blur(10px)",
             }}
           >
             <Tab

@@ -31,10 +31,8 @@ const signup = async (
   return res.data;
 };
 
-const login = async (
-  data: ProductFormValues
-): Promise<{ message: string; user: User }> => {
-  const res = await query.post("/users/login", data);
+const login = async (data: { UserName: string; Password: string }) => {
+  const res = await query.post("/UserLogin", data);
 
   return res.data;
 };

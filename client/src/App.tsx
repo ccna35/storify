@@ -84,7 +84,7 @@ const App = () => {
     palette: {
       mode: colorTheme,
       primary: {
-        main: "#800f2f",
+        main: "#1790FF",
       },
       secondary: {
         main: "#19857b",
@@ -121,7 +121,6 @@ const App = () => {
         },
         styleOverrides: {
           root: {
-            // borderRadius: 10,
             padding: 10,
           },
         },

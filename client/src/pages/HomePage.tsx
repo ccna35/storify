@@ -17,6 +17,7 @@ import BarComponent from "../components/Pages/HomePage/BarComponent";
 import DemoLineChart from "../components/Pages/HomePage/Charts/DemoLineChart";
 import CardHeader from "../components/Pages/HomePage/Cards/CardHeader";
 import PendingWorkOrders from "../components/Pages/HomePage/Cards/PendingWorkOrders";
+import { useErrorBoundary } from "react-error-boundary";
 
 const SimpleDataGridWithHeadline = withHeadline(
   SimpleDataGrid,
@@ -24,10 +25,16 @@ const SimpleDataGridWithHeadline = withHeadline(
 );
 
 const HomePage = () => {
-  const { data, isLoading, isSuccess } = useQuery({
+  const { showBoundary } = useErrorBoundary();
+
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["dashboard"],
     queryFn: () => DashboardService.getDashboard(),
   });
+
+  if (isError) {
+    showBoundary(error);
+  }
 
   // return (
   //   <Typography variant="h5" component={"h1"} fontWeight={500}>
@@ -65,47 +72,6 @@ const HomePage = () => {
 
           <Grid item xs={12} sm={6} md={4} lg={3}>
             <PendingWorkOrders data={data} />
-            {/* <Stack
-            component={"article"}
-              spacing={2}
-              justifyContent={"center"}
-              alignItems={"center"}
-              sx={{
-                boxShadow:
-                  "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
-                borderRadius: "10px",
-                padding: 2,
-                backgroundColor: "#fff",
-              }}
-            >
-              <CardHeader title="Pending Work Orders" />
-              <Stack direction={"row"} spacing={4}>
-                <Stack spacing={1} alignItems={"center"}>
-                  <Typography variant="h2" fontWeight={500} color="#01DE9C">
-                    {
-                      data.WorkOrdersPending.filter((order) =>
-                        order.WorkOrderDate.includes("2024")
-                      ).length
-                    }
-                  </Typography>
-                  <Typography variant="body1" color="#01DE9C">
-                    2024
-                  </Typography>
-                </Stack>
-                <Stack spacing={1} alignItems={"center"}>
-                  <Typography variant="h2" fontWeight={500} color="#FFBA08">
-                    {
-                      data.WorkOrdersPending.filter((order) =>
-                        order.WorkOrderDate.includes("2023")
-                      ).length
-                    }
-                  </Typography>
-                  <Typography variant="body1" color="#FFBA08">
-                    2023
-                  </Typography>
-                </Stack>
-              </Stack>
-            </Stack> */}
           </Grid>
 
           {/* Work orders received ------ Work orders in progress */}
@@ -118,6 +84,7 @@ const HomePage = () => {
                 borderRadius: "10px",
                 padding: 2,
                 width: "100%",
+                backgroundColor: "white",
               }}
             >
               <DemoBarChart
@@ -150,6 +117,7 @@ const HomePage = () => {
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
                 padding: 2,
+                backgroundColor: "white",
               }}
             >
               <DemoPieChart
@@ -174,6 +142,7 @@ const HomePage = () => {
                 borderRadius: "10px",
                 padding: 2,
                 width: "100%",
+                backgroundColor: "white",
               }}
             >
               <DemoBarChart
@@ -209,6 +178,7 @@ const HomePage = () => {
                 borderRadius: "10px",
                 padding: 1,
                 width: "100%",
+                backgroundColor: "white",
               }}
             >
               <DemoBarChart
@@ -245,6 +215,7 @@ const HomePage = () => {
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
                 padding: 1,
+                backgroundColor: "white",
               }}
             >
               <DemoPieChart
@@ -267,6 +238,7 @@ const HomePage = () => {
                   "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
                 borderRadius: "10px",
                 padding: 1,
+                backgroundColor: "white",
               }}
             >
               <DemoLineChart
@@ -287,24 +259,6 @@ const HomePage = () => {
               />
             </Box>
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-            <SimpleDataGridWithHeadline
-              rows={data.WorkOrdersPending}
-              columns={columns}
-              id="idWorkOrder"
-              columnVisibilityModel={{
-                idWorkOrder: false,
-                LastUpdateDate: false,
-                ActionDate: false,
-                ActionID: false,
-                GovernoratesName: false,
-                SubProjectsName: false,
-                SiteType: false,
-                CompanyProjectsName: false,
-                WorkOrderStatus: false,
-              }}
-            />
-          </Grid> */}
         </Grid>
       )}
     </>
