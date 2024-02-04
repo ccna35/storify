@@ -58,17 +58,21 @@ query.interceptors.response.use(
 async function refreshToken() {
   // Replace this with your logic to refresh the token using the refresh token from localStorage
   // Example:
-  console.log("refreshToken");
-
   try {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refreshToken");
-    const response = await query.post("/token", { refreshToken, token });
+    const response = await query.post("/token8", { refreshToken, token });
     const newAccessToken = response.data.token;
     localStorage.setItem("token", newAccessToken);
     return newAccessToken;
   } catch (error) {
     console.log(error);
+    if (error.response.status === 401) {
+      alert("Session expired, please log in again");
+      localStorage.clear();
+      window.location.replace("/login");
+      //show modal for user to end the session and log in again
+    }
   }
 }
 

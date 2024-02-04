@@ -207,28 +207,6 @@ const HomePage = () => {
           </Grid>
 
           {/* Open missions ------ Completed work without acceptance */}
-          <Grid item xs={12} sm={6}>
-            <Box
-              flex={1}
-              sx={{
-                boxShadow:
-                  "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
-                borderRadius: "10px",
-                padding: 1,
-                backgroundColor: "white",
-              }}
-            >
-              <DemoPieChart
-                title="Open missions"
-                labels={data.AllMissionsInProgressPerProject.map(
-                  (order) => order.CompanyProjectsName
-                )}
-                series={data.AllMissionsInProgressPerProject.map(
-                  (order) => order.Count
-                )}
-              />
-            </Box>
-          </Grid>
 
           <Grid item xs={12} sm={6}>
             <Box
@@ -256,6 +234,28 @@ const HomePage = () => {
                     name: "2023",
                   },
                 ]}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box
+              flex={1}
+              sx={{
+                boxShadow:
+                  "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+                borderRadius: "10px",
+                padding: 1,
+                backgroundColor: "white",
+              }}
+            >
+              <DemoPieChart
+                title="Open missions"
+                labels={data.AllMissionsInProgressPerProject.map(
+                  (order) => order.CompanyProjectsName
+                )}
+                series={data.AllMissionsInProgressPerProject.map(
+                  (order) => order.Count
+                )}
               />
             </Box>
           </Grid>

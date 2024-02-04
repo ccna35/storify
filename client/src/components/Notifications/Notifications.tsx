@@ -3,11 +3,27 @@ import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import { useState } from "react";
-import { Chip, IconButton, Stack, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Alert,
+  Chip,
+  IconButton,
+  Snackbar,
+  SnackbarOrigin,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { LockClock, NotificationsTwoTone, Person } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardService } from "../../api/dashboard";
 import { motion, AnimatePresence } from "framer-motion";
+import { LoadingButton } from "@mui/lab";
+import { useSnackbar } from "notistack";
+
+interface State extends SnackbarOrigin {
+  open: boolean;
+}
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -32,10 +48,12 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 type NotificationCardProps = {
+  type: "Materials" | "Missions";
   person: string;
   requestDate: string;
   description: string;
   requestNumber: string;
+  id: number;
 };
 
 const NotificationCard = ({
@@ -43,15 +61,27 @@ const NotificationCard = ({
   requestNumber,
   requestDate,
   description,
+  id,
+  type,
 }: NotificationCardProps) => {
+  const queryClient = useQueryClient();
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { mutateAsync: updateChangeStatus } = useMutation({
+    mutationFn: DashboardService.updateChangeRequestStatus,
+    onSuccess: () => {
+      enqueueSnackbar("Status updated successfully", { variant: "success" });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+    },
+    onError: (error) => {
+      console.log(error);
+      enqueueSnackbar("Something went bad :(", { variant: "error" });
+    },
+  });
+
   return (
-    <Box
-      // component={motion.div}
-      sx={{ p: 3, borderRadius: 3 }}
-      // initial={{ opacity: 0, x: 80, scale: 0.3 }}
-      // animate={{ opacity: 1, x: 0, scale: 1 }}
-      // exit={{ opacity: 0, scale: 0.5, transition: { duration: 1 } }}
-    >
+    <Box sx={{ p: 3, borderRadius: 3 }}>
       <Stack spacing={2}>
         {/* <Avatar src="/broken-image.jpg" /> */}
         <Stack direction={"row"} spacing={2}>
@@ -108,7 +138,7 @@ const NotificationCard = ({
           {description}
         </Typography>
         <Stack direction={"row"} spacing={2}>
-          <Button
+          <LoadingButton
             sx={{
               textTransform: "capitalize",
               px: 1.5,
@@ -120,10 +150,17 @@ const NotificationCard = ({
               },
             }}
             variant="contained"
+            onClick={() =>
+              updateChangeStatus({
+                ChangeRequestStatus: "Approved",
+                SelectedID: id,
+                type,
+              })
+            }
           >
             Accept
-          </Button>
-          <Button
+          </LoadingButton>
+          <LoadingButton
             sx={{
               textTransform: "capitalize",
               px: 1.5,
@@ -135,14 +172,29 @@ const NotificationCard = ({
               },
             }}
             variant="contained"
+            onClick={() =>
+              updateChangeStatus({
+                ChangeRequestStatus: "Not Approved",
+                SelectedID: id,
+                type,
+              })
+            }
           >
             Discard
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
     </Box>
   );
 };
+
+const NoDataMessage = () => (
+  <Box sx={{ p: 3 }}>
+    <Typography sx={{ p: 3, borderRadius: 5, backgroundColor: "#F3F3F3" }}>
+      Nothing to see here!
+    </Typography>
+  </Box>
+);
 
 type NotificationsPanelProps = {
   enableAnimations?: boolean;
@@ -291,6 +343,8 @@ export default function NotificationsPanel({
             >
               {isLoading ? (
                 <Typography>Loading...</Typography>
+              ) : data?.materialschangerequests.length === 0 ? (
+                <NoDataMessage />
               ) : (
                 data?.materialschangerequests.map((card) => (
                   <NotificationCard
@@ -299,6 +353,8 @@ export default function NotificationsPanel({
                     requestDate={card.RequestDate}
                     person={card.ERPUserNickName}
                     requestNumber={card.MaterialsRequestNo}
+                    type="Materials"
+                    id={card.idMaterialsRequestChangeRequests}
                   />
                 ))
               )}
@@ -312,16 +368,8 @@ export default function NotificationsPanel({
                 />
               }
             >
-              {isLoading ? (
-                <Typography>Loading...</Typography>
-              ) : data?.missionschangerequests.length === 0 ? (
-                <Box sx={{ p: 3 }}>
-                  <Typography
-                    sx={{ p: 3, borderRadius: 5, backgroundColor: "#F3F3F3" }}
-                  >
-                    Nothing to see here!
-                  </Typography>
-                </Box>
+              {data?.missionschangerequests.length === 0 ? (
+                <NoDataMessage />
               ) : (
                 data?.missionschangerequests.map((card) => (
                   <NotificationCard
@@ -330,6 +378,8 @@ export default function NotificationsPanel({
                     requestDate={card.RequestDate}
                     person={card.ERPUserNickName}
                     requestNumber={card.MissionNo}
+                    type="Missions"
+                    id={card.idMissionsChangeRequests}
                   />
                 ))
               )}

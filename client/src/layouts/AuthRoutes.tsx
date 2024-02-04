@@ -1,13 +1,14 @@
-import { Suspense, useContext } from "react";
+import { Suspense } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { UserContext } from "../hooks/UserContext";
 import SpinnerOfDoom from "../components/Spinners/SpinnerOfDoom";
+import { useAppSelector } from "../app/hooks";
+import { userSelector } from "../app/slices/authSlice";
 
 const AuthRoutes = () => {
-  const { user } = useContext(UserContext);
+  const { UserName } = useAppSelector(userSelector);
 
-  return user ? (
-    <Navigate to="/" />
+  return UserName ? (
+    <Navigate to="/" replace />
   ) : (
     <Suspense fallback={<SpinnerOfDoom />}>
       <Outlet />

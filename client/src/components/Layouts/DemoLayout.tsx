@@ -23,6 +23,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import {
   Button,
   Collapse,
+  Container,
   Link,
   Menu,
   MenuItem,
@@ -35,6 +36,7 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import {
   Add,
+  Dashboard,
   ExpandLess,
   ExpandMore,
   Settings,
@@ -44,12 +46,16 @@ import BasicBreadcrumbs from "../Navbar/Breadcrumbs";
 import SpinnerOfDoom from "../Spinners/SpinnerOfDoom";
 import NotificationsPanel from "../Notifications/Notifications";
 import DropDown from "./DropDown";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ProductService } from "../../api/products";
 import { MissionsService } from "../../api/missions";
 import { ErrorBoundary } from "react-error-boundary";
+import { DashboardService } from "../../api/dashboard";
+import { useAppDispatch } from "../../store/store";
+import { clearUser, userSelector } from "../../app/slices/authSlice";
+import { useAppSelector } from "../../app/hooks";
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -124,19 +130,20 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+const logError = (error: Error, info: React.ErrorInfo) => {
+  console.log(error);
+  console.log(info);
+};
+
 export default function DemoLayout() {
   // Left Drawer logic
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
-
-  // Left Drawer logic
-  const [dropDownsState, setDropDownsState] = useState(true);
 
   const handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
 
   const handleDrawerClose = () => {
-    setDropDownsState(false);
     setIsDrawerOpen(false);
   };
 
@@ -151,6 +158,10 @@ export default function DemoLayout() {
       console.log(error);
     },
   });
+
+  const dispatch = useAppDispatch();
+
+  const { UserPriv } = useAppSelector(userSelector);
 
   return (
     <UserProvider>
@@ -196,6 +207,7 @@ export default function DemoLayout() {
               variant="contained"
               color="error"
               onClick={() => {
+                dispatch(clearUser());
                 localStorage.removeItem("token");
                 navigate("/login");
               }}
@@ -205,11 +217,20 @@ export default function DemoLayout() {
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={isDrawerOpen}>
-          <DrawerHeader>
-            <Stack direction={"row"} alignItems={"center"} spacing={1}>
+          <DrawerHeader
+            sx={{
+              justifyContent: isDrawerOpen ? "flex-start" : "center",
+              pl: isDrawerOpen ? "20px" : "8px",
+            }}
+          >
+            <Stack direction={"row"} spacing={1}>
               {isDrawerOpen ? (
                 <Box sx={{ width: "100%" }}>
-                  <img src="./genilogo.png" alt="" style={{ width: "100%" }} />
+                  <img
+                    src="./genilogo.png"
+                    alt=""
+                    style={{ width: "100%", maxWidth: "200px" }}
+                  />
                 </Box>
               ) : (
                 <Box sx={{ width: "40px" }}>
@@ -223,91 +244,82 @@ export default function DemoLayout() {
             </Stack>
           </DrawerHeader>
           <List>
-            {["Home", "Products"].map((text, index) => (
-              <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                <Link
-                  component={RouterLink}
-                  to={text === "Home" ? "/" : "/products"}
-                  underline="none"
-                  sx={{ color: "#262626" }}
+            <ListItem disablePadding sx={{ display: "block" }}>
+              <Link
+                component={RouterLink}
+                to="/"
+                underline="none"
+                sx={{ color: "#262626" }}
+              >
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: isDrawerOpen ? "initial" : "center",
+                    px: 2.5,
+                    "&:hover": {
+                      backgroundColor: "#E6F4FF",
+                    },
+                  }}
                 >
-                  <ListItemButton
+                  <ListItemIcon
                     sx={{
-                      minHeight: 48,
-                      justifyContent: isDrawerOpen ? "initial" : "center",
-                      px: 2.5,
-                      "&:hover": {
-                        backgroundColor: "#E6F4FF",
-                      },
+                      minWidth: 0,
+                      mr: isDrawerOpen ? 1 : "auto",
+                      justifyContent: "center",
                     }}
                   >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 0,
-                        mr: isDrawerOpen ? 3 : "auto",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={text}
-                      sx={{ opacity: isDrawerOpen ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </Link>
-              </ListItem>
-            ))}
-
-            <DropDown
-              isDrawerOpen={isDrawerOpen}
-              menuItems={["Home", "Products"]}
-              dropDownsState={dropDownsState}
-            />
-          </List>
-          <Divider />
-          <List>
-            {["Home", "Products"].map((text, index) => (
-              <ListItem key={text} disablePadding sx={{ display: "block" }}>
-                <Link
-                  component={RouterLink}
-                  to={text === "Home" ? "/" : "/products"}
-                  underline="none"
-                  sx={{ color: "#262626" }}
-                >
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: isDrawerOpen ? "initial" : "center",
-                      px: 2.5,
-                      "&:hover": {
-                        backgroundColor: "#E6F4FF",
-                      },
-                    }}
+                    <Dashboard />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary="Dashboard"
+                    sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+                  />
+                </ListItemButton>
+              </Link>
+            </ListItem>
+            {UserPriv.map((item) => (
+              <ListItem
+                key={item.ModulesCategoryName}
+                disablePadding
+                sx={{ display: "block" }}
+              >
+                {item.SystemModuleName.split(", ").length === 0 ? (
+                  <Link
+                    component={RouterLink}
+                    to="/"
+                    underline="none"
+                    sx={{ color: "#262626" }}
                   >
-                    <ListItemIcon
+                    <ListItemButton
                       sx={{
-                        minWidth: 0,
-                        mr: isDrawerOpen ? 3 : "auto",
-                        justifyContent: "center",
+                        minHeight: 48,
+                        justifyContent: isDrawerOpen ? "initial" : "center",
+                        px: 2.5,
+                        "&:hover": {
+                          backgroundColor: "#E6F4FF",
+                        },
                       }}
                     >
-                      {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={text}
-                      sx={{ opacity: isDrawerOpen ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </Link>
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: isDrawerOpen ? 3 : "auto",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <InboxIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={item.ModulesCategoryName}
+                        sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+                      />
+                    </ListItemButton>
+                  </Link>
+                ) : (
+                  <DropDown isDrawerOpen={isDrawerOpen} item={item} />
+                )}
               </ListItem>
             ))}
-
-            <DropDown
-              isDrawerOpen={isDrawerOpen}
-              menuItems={["Home", "Products"]}
-              dropDownsState={dropDownsState}
-            />
           </List>
         </Drawer>
         <Box
@@ -321,8 +333,13 @@ export default function DemoLayout() {
         >
           <DrawerHeader />
           <Suspense fallback={<SpinnerOfDoom />}>
-            <ErrorBoundary fallback={<div>Something went wrong</div>}>
-              <Outlet />
+            <ErrorBoundary
+              fallback={<div>Something went wrong</div>}
+              onError={logError}
+            >
+              <Container maxWidth="lg">
+                <Outlet />
+              </Container>
             </ErrorBoundary>
           </Suspense>
         </Box>

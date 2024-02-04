@@ -46,10 +46,6 @@ export default function BasicModal({
     console.log(error);
   }
 
-  if (isSuccess) {
-    console.log(data);
-  }
-
   if (isRefetching) {
     console.log("isRefetching");
   }

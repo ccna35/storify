@@ -7,16 +7,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import axios from "axios";
 import { useForm } from "react-hook-form";
-import { API_URL } from "../env";
 import { LoadingButton } from "@mui/lab";
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { UserContext } from "../hooks/UserContext";
 import { useMutation } from "@tanstack/react-query";
 import { UserService } from "../api/users";
 import { jwtDecode } from "jwt-decode";
+import { useAppDispatch } from "../store/store";
+import { setUser } from "../app/slices/authSlice";
 
 type FormValues = {
   UserName: string;
@@ -29,19 +28,26 @@ const INITIAL_VALUES: FormValues = {
 };
 
 const Login = () => {
-  const { user, updateUserInfo } = useContext(UserContext);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState("");
 
-  const { mutateAsync: login } = useMutation({
+  const { mutateAsync: login, isPending } = useMutation({
     mutationFn: UserService.login,
     onSuccess: (data) => {
       console.log(data);
-      console.log(JSON.parse(jwtDecode(data.token).ColumnsConfig));
+      console.log(jwtDecode(data.token));
+
+      const username = jwtDecode(data.token).UserName;
+      const user_privileges = jwtDecode(data.token).UserPriv;
+
+      localStorage.setItem("UserName", JSON.stringify(username));
+      localStorage.setItem("UserPriv", JSON.stringify(user_privileges));
+      dispatch(setUser({ UserName: username, UserPriv: user_privileges }));
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
-      navigate("/");
+      navigate("/", { replace: true });
     },
     onError: (error) => {
       console.log(error);
@@ -51,7 +57,7 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { errors },
   } = useForm<FormValues>({
     defaultValues: INITIAL_VALUES,
     mode: "onChange",
@@ -100,7 +106,7 @@ const Login = () => {
               type="submit"
               variant="contained"
               color="primary"
-              loading={isSubmitting}
+              loading={isPending}
             >
               Log in
             </LoadingButton>

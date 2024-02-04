@@ -1,13 +1,10 @@
-import { useContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { UserContext } from "../hooks/UserContext";
+import { userSelector } from "../app/slices/authSlice";
+import { useAppSelector } from "../app/hooks";
 
 const PrivateRoutes = () => {
-  const { user } = useContext(UserContext);
-
-  return <Outlet />;
-
-  // return user ? <Outlet /> : <Navigate to="/login" />;
+  const { UserName } = useAppSelector(userSelector);
+  return UserName ? <Outlet /> : <Navigate to={"/login"} replace />;
 };
 
 export default PrivateRoutes;

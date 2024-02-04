@@ -76,12 +76,11 @@ const DemoBarChart = ({
     chart: {
       type: "bar",
       height: 430,
-      width: "400px",
+      width: "100%",
     },
     plotOptions: {
       bar: {
         horizontal,
-        // borderRadius: 5,
         dataLabels: {
           position: "top",
         },

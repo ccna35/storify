@@ -30,7 +30,7 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
     boxShadow:
       "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
     borderRadius: "10px",
-    width: 200,
+    width: 250,
   },
   [`& .${tooltipClasses.arrow}`]: {
     color: "white",
@@ -39,17 +39,15 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
 
 type DropDownProps = {
   isDrawerOpen: boolean;
-  dropDownsState: boolean;
-  menuItems: string[];
+  item: {
+    ModulesCategoryName: string;
+    SystemModuleName: string;
+  };
 };
 
-const DropDown = ({
-  isDrawerOpen,
-  menuItems,
-  dropDownsState,
-}: DropDownProps) => {
+const DropDown = ({ isDrawerOpen, item }: DropDownProps) => {
   // Dropdown logic
-  const [dropDownStatus, setDropDownStatus] = useState(true);
+  const [dropDownStatus, setDropDownStatus] = useState(false);
 
   const handleDropDownClick = () => {
     if (isDrawerOpen) setDropDownStatus(!dropDownStatus);
@@ -60,9 +58,9 @@ const DropDown = ({
         <CustomWidthTooltip
           title={
             <Stack spacing={1}>
-              {["Home", "Products"].map((text) => (
+              {item.SystemModuleName.split(", ").map((menuItem) => (
                 <Box
-                  key={text}
+                  key={menuItem}
                   sx={{
                     px: 2,
                     py: 1,
@@ -75,13 +73,13 @@ const DropDown = ({
                 >
                   <Link
                     component={RouterLink}
-                    to={text === "Home" ? "/" : "/products"}
+                    to="/"
                     underline="none"
                     sx={{
                       color: "#262626",
                     }}
                   >
-                    <Typography>{text}</Typography>
+                    <Typography fontSize={14}>{menuItem}</Typography>
                   </Link>
                   <Button
                     onClick={() => console.log("Hey!")}
@@ -118,25 +116,25 @@ const DropDown = ({
       )}
       {isDrawerOpen && (
         <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
-          <ListItemIcon>
+          <ListItemIcon sx={{ minWidth: 0, mr: isDrawerOpen ? 1 : "auto" }}>
             <InboxIcon />
           </ListItemIcon>
-          <ListItemText primary="Inbox" />
+          <ListItemText primary={item.ModulesCategoryName} />
           {dropDownStatus ? <ExpandLess /> : <ExpandMore />}
         </ListItemButton>
       )}
       {isDrawerOpen && (
         <Collapse in={dropDownStatus} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {menuItems.map((text, index) => (
+          <List component="ul" disablePadding>
+            {item.SystemModuleName.split(", ").map((menuItem) => (
               <ListItem
-                key={text}
+                key={menuItem}
                 disablePadding
                 sx={{ display: "block", position: "relative" }}
               >
                 <Link
                   component={RouterLink}
-                  to={text === "Home" ? "/" : "/products"}
+                  to="/"
                   underline="none"
                   sx={{ color: "#262626" }}
                 >
@@ -150,8 +148,14 @@ const DropDown = ({
                     }}
                   >
                     <ListItemText
-                      primary={text}
-                      sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+                      primary={menuItem}
+                      sx={{
+                        opacity: isDrawerOpen ? 1 : 0,
+                        color: "grey",
+                        "& span": {
+                          fontSize: 14,
+                        },
+                      }}
                     />
                   </ListItemButton>
                 </Link>

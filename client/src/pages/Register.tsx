@@ -21,6 +21,7 @@ import { UserContext } from "../hooks/UserContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserService } from "../api/users";
 import { ErrorOutline } from "@mui/icons-material";
+import { useSnackbar } from "notistack";
 
 export type UserFormValues = {
   id?: number;
@@ -46,30 +47,7 @@ interface State extends SnackbarOrigin {
 const Register = () => {
   const queryClient = useQueryClient();
 
-  const [state, setState] = useState<State>({
-    open: false,
-    vertical: "top",
-    horizontal: "center",
-  });
-  const { vertical, horizontal, open } = state;
-
-  const showSuccessMessage = () => {
-    setState({ ...state, open: true });
-  };
-
-  const handleClose = () => {
-    setState({ ...state, open: false });
-  };
-
-  const { user, updateUserInfo } = useContext(UserContext);
-
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [navigate, user]);
 
   const {
     mutateAsync: signup,
@@ -84,10 +62,8 @@ const Register = () => {
 
       //  Update user state with new data
       const { user_email: email, first_name, last_name, added, id } = data.user;
-      updateUserInfo({ first_name, last_name, added, email, id });
       localStorage.setItem("user", JSON.stringify(data.user));
-      navigate("/");
-      showSuccessMessage();
+      navigate("/", { replace: true });
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: (error) => {
@@ -297,21 +273,6 @@ const Register = () => {
               </Link>
             </Stack>
           </Stack>
-          <Snackbar
-            anchorOrigin={{ vertical, horizontal }}
-            open={open}
-            onClose={handleClose}
-            key={vertical + horizontal}
-            autoHideDuration={2000}
-          >
-            <Alert
-              onClose={handleClose}
-              severity="success"
-              sx={{ width: "100%" }}
-            >
-              You registered successfully!
-            </Alert>
-          </Snackbar>
         </form>
       </Container>
     </Box>

@@ -24,6 +24,7 @@ const DemoLineChart = ({ series, xaxis, title }: DemoLineChartProps) => {
     chart: {
       type: "area",
       height: 350,
+      width: "100%",
     },
     stroke: {
       curve: "smooth",
