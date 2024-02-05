@@ -41,28 +41,36 @@ const NotificationsContainer = ({ data }: NotificationsContainerProps) => {
           />
         }
       >
-        <ExpiryNotification
-          title="Expired National ID"
-          expiredCount={data.EmpNationalIDExpired[0].Count}
-          expiringNextMonthCount={data.EmpNationalIDExpiredNextMonth[0].Count}
-          type="id"
-        />
-        <ExpiryNotification
-          title="Expired Car Licences"
-          expiredCount={data.CarNowithCarLicenceExpire[0].Count}
-          expiringNextMonthCount={
-            data.CarNowithCarLicenceExpireNextMonth[0].Count
-          }
-          type="car"
-        />
-        <ExpiryNotification
-          title="Expired Driving Licences"
-          expiredCount={data.EmpDrivingLicenceExpired[0].Count}
-          expiringNextMonthCount={
-            data.EmpDrivingLicenceExpiredNextMonth[0].Count
-          }
-          type="driver"
-        />
+        {data.EmpNationalIDExpired.length !== 0 && (
+          <ExpiryNotification
+            title="Expired National ID"
+            expiredCount={data.EmpNationalIDExpired[0].Count}
+            expiringNextMonthCount={data.EmpNationalIDExpiredNextMonth[0].Count}
+            type="id"
+          />
+        )}
+
+        {data.CarNowithCarLicenceExpire.length !== 0 && (
+          <ExpiryNotification
+            title="Expired Car Licences"
+            expiredCount={data.CarNowithCarLicenceExpire[0].Count}
+            expiringNextMonthCount={
+              data.CarNowithCarLicenceExpireNextMonth[0].Count
+            }
+            type="car"
+          />
+        )}
+
+        {data.EmpDrivingLicenceExpired.length !== 0 && (
+          <ExpiryNotification
+            title="Expired Driving Licences"
+            expiredCount={data.EmpDrivingLicenceExpired[0].Count}
+            expiringNextMonthCount={
+              data.EmpDrivingLicenceExpiredNextMonth[0].Count
+            }
+            type="driver"
+          />
+        )}
       </Stack>
 
       <Box
@@ -84,7 +92,6 @@ const NotificationsContainer = ({ data }: NotificationsContainerProps) => {
                 ".MuiTabs-indicator": {
                   backgroundColor: "transparent",
                 },
-                // borderBottom: "1px dashed lightgrey",
               }}
             >
               <Tab
@@ -115,54 +122,74 @@ const NotificationsContainer = ({ data }: NotificationsContainerProps) => {
               />
             </TabList>
           </Box>
-          <TabPanel value="1" sx={{}}>
+          <TabPanel value="1">
             <Stack spacing={2}>
-              <SimpleNotification
-                title="Quotations Not Invoiced"
-                type="document"
-                count={data.AllQuotationsNotInvoiced[0].Count}
-              />
-              <SimpleNotification
-                title="Vacations Without Attachment"
-                type="vacation"
-                count={data.AllVacationNoAttachmentCount[0].Count}
-              />
-              <SimpleNotification
-                title="Invoices With No PO"
-                type="document"
-                count={data.AllInvoicesWithNoPO[0].Count}
-              />
-              <SimpleNotification
-                title="Invoices With No Government Invoice"
-                type="document"
-                count={data.AllInvoicesWithNoGovernmentInvoice[0].Count}
-              />
+              {data.AllQuotationsNotInvoiced.length !== 0 && (
+                <SimpleNotification
+                  title="Quotations Not Invoiced"
+                  type="document"
+                  count={data.AllQuotationsNotInvoiced[0].Count}
+                />
+              )}
+
+              {data.AllVacationNoAttachmentCount.length !== 0 && (
+                <SimpleNotification
+                  title="Vacations Without Attachment"
+                  type="vacation"
+                  count={data.AllVacationNoAttachmentCount[0].Count}
+                />
+              )}
+              {data.AllInvoicesWithNoPO.length !== 0 && (
+                <SimpleNotification
+                  title="Invoices With No PO"
+                  type="document"
+                  count={data.AllInvoicesWithNoPO[0].Count}
+                />
+              )}
+              {data.AllInvoicesWithNoGovernmentInvoice.length !== 0 && (
+                <SimpleNotification
+                  title="Invoices With No Government Invoice"
+                  type="document"
+                  count={data.AllInvoicesWithNoGovernmentInvoice[0].Count}
+                />
+              )}
             </Stack>
           </TabPanel>
           <TabPanel value="2">
             <Stack spacing={2}>
-              <SimpleNotification
-                title="Invoices With No Submission Date"
-                type="document"
-                count={data.AllInvoicesWithNoSubmissionDate[0].Count}
-              />
-              <SimpleNotification
-                title="Missions Change Requests Count"
-                type="document"
-                count={data.MissionsChangeRequestsCount[0].Count}
-                inProgress
-              />
-              <SimpleNotification
-                title="Materials Change Requests Count"
-                type="document"
-                count={data.MaterialsChangeRequestsCount[0].Count}
-                inProgress
-              />
-              <SimpleNotification
-                title="Materials Request Sent Count"
-                type="document"
-                count={data.MaterialsRequestSentCount[0].Count}
-              />
+              {data.AllInvoicesWithNoSubmissionDate.length !== 0 && (
+                <SimpleNotification
+                  title="Invoices With No Submission Date"
+                  type="document"
+                  count={data.AllInvoicesWithNoSubmissionDate[0].Count}
+                />
+              )}
+
+              {data.MissionsChangeRequestsCount.length !== 0 && (
+                <SimpleNotification
+                  title="Missions Change Requests Count"
+                  type="document"
+                  count={data.MissionsChangeRequestsCount[0].Count}
+                  inProgress
+                />
+              )}
+
+              {data.MaterialsChangeRequestsCount.length !== 0 && (
+                <SimpleNotification
+                  title="Materials Change Requests Count"
+                  type="document"
+                  count={data.MaterialsChangeRequestsCount[0].Count}
+                  inProgress
+                />
+              )}
+
+              {data.MaterialsRequestSentCount.length !== 0 && (
+                <SimpleNotification
+                  title="Materials Request Sent Count"
+                  type="document"
+                  count={data.MaterialsRequestSentCount[0].Count}
+                />
+              )}
             </Stack>
           </TabPanel>
         </TabContext>

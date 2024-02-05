@@ -61,7 +61,7 @@ async function refreshToken() {
   try {
     const token = localStorage.getItem("token");
     const refreshToken = localStorage.getItem("refreshToken");
-    const response = await query.post("/token8", { refreshToken, token });
+    const response = await query.post("/token", { refreshToken, token });
     const newAccessToken = response.data.token;
     localStorage.setItem("token", newAccessToken);
     return newAccessToken;

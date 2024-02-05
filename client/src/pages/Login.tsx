@@ -16,6 +16,7 @@ import { UserService } from "../api/users";
 import { jwtDecode } from "jwt-decode";
 import { useAppDispatch } from "../store/store";
 import { setUser } from "../app/slices/authSlice";
+import { useSnackbar } from "notistack";
 
 type FormValues = {
   UserName: string;
@@ -28,6 +29,8 @@ const INITIAL_VALUES: FormValues = {
 };
 
 const Login = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState("");
@@ -35,9 +38,6 @@ const Login = () => {
   const { mutateAsync: login, isPending } = useMutation({
     mutationFn: UserService.login,
     onSuccess: (data) => {
-      console.log(data);
-      console.log(jwtDecode(data.token));
-
       const username = jwtDecode(data.token).UserName;
       const user_privileges = jwtDecode(data.token).UserPriv;
 
@@ -51,6 +51,7 @@ const Login = () => {
     },
     onError: (error) => {
       console.log(error);
+      enqueueSnackbar("Something went bad :(", { variant: "error" });
     },
   });
 
