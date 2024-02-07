@@ -1,4 +1,4 @@
-import { Box, Divider, Stack } from "@mui/material";
+import { Box } from "@mui/material";
 import Card from "./Card/Card";
 import {
   DraftIcon,
@@ -8,8 +8,6 @@ import {
   TotalIcon,
 } from "./Card/Icons";
 import { blue, green, grey, orange, red } from "@mui/material/colors";
-
-// const IMG_PATH = "./products/cards/";
 
 const cards = [
   {
@@ -61,10 +59,11 @@ const SummaryPanel = () => {
     <Box
       sx={{
         display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
+        gridTemplateColumns: `repeat(${cards.length}, 1fr)`,
         boxShadow:
           "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
         borderRadius: "16px",
+        backgroundColor: "#fff",
       }}
     >
       {cards.map((card) => {

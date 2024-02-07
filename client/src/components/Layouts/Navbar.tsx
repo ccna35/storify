@@ -6,6 +6,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import BasicBreadcrumbs from "../Navbar/Breadcrumbs";
 import NotificationsPanel from "../Notifications/Notifications";
 import { Button } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
+import { MissionsService } from "../../api/missions";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -48,6 +50,17 @@ const Navbar = ({
     }),
   }));
 
+  const { mutateAsync: createMission } = useMutation({
+    mutationFn: MissionsService.createMission,
+    // onSuccess: () => {
+    //   showSuccessMessage();
+    //   queryClient.invalidateQueries({ queryKey: ["products"] });
+    // },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
   return (
     <AppBar position="fixed" open={isDrawerOpen} sx={{ boxShadow: "none" }}>
       <Toolbar sx={{ gap: 3 }}>
@@ -75,7 +88,11 @@ const Navbar = ({
 
         <BasicBreadcrumbs />
         <NotificationsPanel enableAnimations />
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => createMission()}
+        >
           New Mission
         </Button>
         <Button variant="contained" color="error" onClick={handleLogOut}>

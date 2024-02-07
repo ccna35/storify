@@ -24,7 +24,7 @@ import DemoLayout from "./components/Layouts/DemoLayout.tsx";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route path="/" element={<DemoLayout />} errorElement={<ErrorPage />}>
+      <Route element={<DemoLayout />} errorElement={<ErrorPage />}>
         <Route element={<PrivateRoutes />}>
           {PRIVATE_ROUTES.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />

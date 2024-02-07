@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material";
+import { Box, Grid, Stack } from "@mui/material";
 import DemoBarChart from "../components/Pages/HomePage/Charts/DemoBarChart";
 import SimpleDataGrid from "../components/Pages/HomePage/DataGrids/SimpleDataGrid";
 import { useQuery } from "@tanstack/react-query";
@@ -11,6 +11,8 @@ import EmployeesInsuranceStatus from "../components/Pages/HomePage/EmployeesInsu
 import BarComponent from "../components/Pages/HomePage/BarComponent";
 import DemoLineChart from "../components/Pages/HomePage/Charts/DemoLineChart";
 import PendingWorkOrders from "../components/Pages/HomePage/Cards/PendingWorkOrders";
+import ExpiryNotification from "../components/Pages/HomePage/Notifications/ExpiryNotification";
+import SimpleNotification from "../components/Pages/HomePage/Notifications/SimpleNotification";
 
 const SimpleDataGridWithHeadline = withHeadline(
   SimpleDataGrid,
@@ -71,14 +73,129 @@ const HomePage = () => {
     MissionsChangeRequestsCount,
   } = data;
 
-  console.log(data);
+  const expirationData = {
+    EmpNationalIDExpired,
+    EmpNationalIDExpiredNextMonth,
+    CarNowithCarLicenceExpire,
+    CarNowithCarLicenceExpireNextMonth,
+    EmpDrivingLicenceExpired,
+    EmpDrivingLicenceExpiredNextMonth,
+  };
+
+  console.log(Object.values(expirationData).every((item) => item.length === 0));
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
-      <Grid item xs={12}>
-        <NotificationsContainer data={data} />
-      </Grid>
+      {!Object.values(expirationData).every((item) => item.length === 0) && (
+        <Grid item xs={4}>
+          {/* <NotificationsContainer data={data} /> */}
+          <Stack direction={"column"} spacing={2}>
+            {data.EmpNationalIDExpired.length !== 0 && (
+              <ExpiryNotification
+                title="Expired National ID"
+                expiredCount={data.EmpNationalIDExpired[0].Count}
+                expiringNextMonthCount={
+                  data.EmpNationalIDExpiredNextMonth[0].Count
+                }
+                type="id"
+              />
+            )}
 
+            {data.CarNowithCarLicenceExpire.length !== 0 && (
+              <ExpiryNotification
+                title="Expired Car Licences"
+                expiredCount={data.CarNowithCarLicenceExpire[0].Count}
+                expiringNextMonthCount={
+                  data.CarNowithCarLicenceExpireNextMonth[0].Count
+                }
+                type="car"
+              />
+            )}
+
+            {data.EmpDrivingLicenceExpired.length !== 0 && (
+              <ExpiryNotification
+                title="Expired Driving Licences"
+                expiredCount={data.EmpDrivingLicenceExpired[0].Count}
+                expiringNextMonthCount={
+                  data.EmpDrivingLicenceExpiredNextMonth[0].Count
+                }
+                type="driver"
+              />
+            )}
+          </Stack>
+        </Grid>
+      )}
+
+      {/* <Grid item xs={4}>
+        <Stack direction={"column"} spacing={2}>
+          {data.AllQuotationsNotInvoiced.length !== 0 && (
+            <SimpleNotification
+              title="Quotations Not Invoiced"
+              type="document"
+              count={data.AllQuotationsNotInvoiced[0].Count}
+            />
+          )}
+
+          {data.AllVacationNoAttachmentCount.length !== 0 && (
+            <SimpleNotification
+              title="Vacations Without Attachment"
+              type="vacation"
+              count={data.AllVacationNoAttachmentCount[0].Count}
+            />
+          )}
+          {data.AllInvoicesWithNoPO.length !== 0 && (
+            <SimpleNotification
+              title="Invoices With No PO"
+              type="document"
+              count={data.AllInvoicesWithNoPO[0].Count}
+            />
+          )}
+          {data.AllInvoicesWithNoGovernmentInvoice.length !== 0 && (
+            <SimpleNotification
+              title="Invoices With No Government Invoice"
+              type="document"
+              count={data.AllInvoicesWithNoGovernmentInvoice[0].Count}
+            />
+          )}
+        </Stack>
+      </Grid> */}
+      {/* <Grid item xs={4}>
+        <Stack direction={"column"} spacing={2}>
+          {data.AllInvoicesWithNoSubmissionDate.length !== 0 && (
+            <SimpleNotification
+              title="Invoices With No Submission Date"
+              type="document"
+              count={data.AllInvoicesWithNoSubmissionDate[0].Count}
+            />
+          )}
+
+          {data.MissionsChangeRequestsCount.length !== 0 && (
+            <SimpleNotification
+              title="Missions Change Requests Count"
+              type="document"
+              count={data.MissionsChangeRequestsCount[0].Count}
+              inProgress
+            />
+          )}
+
+          {data.MaterialsChangeRequestsCount.length !== 0 && (
+            <SimpleNotification
+              title="Materials Change Requests Count"
+              type="document"
+              count={data.MaterialsChangeRequestsCount[0].Count}
+              inProgress
+            />
+          )}
+
+          {data.MaterialsRequestSentCount.length !== 0 && (
+            <SimpleNotification
+              title="Materials Request Sent Count"
+              type="document"
+              count={data.MaterialsRequestSentCount[0].Count}
+            />
+          )}
+        </Stack>
+      </Grid> */}
       {CountInsured?.length !== 0 && (
         <Grid item xs={12} sm={6} md={4} lg={3}>
           <EmployeesInsuranceStatus data={data} />

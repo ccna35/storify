@@ -5,7 +5,7 @@ type IconProps = {
 export const TotalIcon = ({ color }: IconProps) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      // xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
       role="img"
       viewBox="0 0 24 24"
@@ -26,7 +26,7 @@ export const TotalIcon = ({ color }: IconProps) => {
 export const PaidIcon = ({ color }: IconProps) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      // xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
       role="img"
       viewBox="0 0 24 24"
@@ -49,7 +49,7 @@ export const PaidIcon = ({ color }: IconProps) => {
 export const PendingIcon = ({ color }: IconProps) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      // xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
       role="img"
       viewBox="0 0 24 24"
@@ -68,7 +68,7 @@ export const PendingIcon = ({ color }: IconProps) => {
 export const OverdueIcon = ({ color }: IconProps) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      // xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
       role="img"
       viewBox="0 0 24 24"
@@ -89,7 +89,7 @@ export const OverdueIcon = ({ color }: IconProps) => {
 export const DraftIcon = ({ color }: IconProps) => {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      // xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
       role="img"
       viewBox="0 0 24 24"

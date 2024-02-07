@@ -8,7 +8,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { Dashboard } from "@mui/icons-material";
+import { Dashboard, ProductionQuantityLimits } from "@mui/icons-material";
 import DropDown from "./DropDown";
 import { Link as RouterLink } from "react-router-dom";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
@@ -98,6 +98,39 @@ const SidebarMenu = ({ isDrawerOpen }: SidebarMenuProps) => {
           )}
         </ListItem>
       ))}
+      <ListItem disablePadding sx={{ display: "block" }}>
+        <Link
+          component={RouterLink}
+          to="/products"
+          underline="none"
+          sx={{ color: "#262626" }}
+        >
+          <ListItemButton
+            sx={{
+              minHeight: 48,
+              justifyContent: isDrawerOpen ? "initial" : "center",
+              px: 2.5,
+              "&:hover": {
+                backgroundColor: "#E6F4FF",
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: isDrawerOpen ? 1 : "auto",
+                justifyContent: "center",
+              }}
+            >
+              <ProductionQuantityLimits />
+            </ListItemIcon>
+            <ListItemText
+              primary="Products"
+              sx={{ opacity: isDrawerOpen ? 1 : 0 }}
+            />
+          </ListItemButton>
+        </Link>
+      </ListItem>
     </List>
   );
 };

@@ -14,12 +14,13 @@ import {
   Stack,
   Box,
   Typography,
+  IconButton,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
 import { useState } from "react";
 import { Add, ExpandLess, ExpandMore } from "@mui/icons-material";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 
 const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -62,6 +63,9 @@ const DropDown = ({ isDrawerOpen, item }: DropDownProps) => {
                 <Box
                   key={menuItem}
                   sx={{
+                    display: "flex",
+                    gap: "1rem",
+                    justifyContent: "space-between",
                     px: 2,
                     py: 1,
                     borderRadius: 1,
@@ -81,24 +85,27 @@ const DropDown = ({ isDrawerOpen, item }: DropDownProps) => {
                   >
                     <Typography fontSize={14}>{menuItem}</Typography>
                   </Link>
-                  <Button
-                    onClick={() => console.log("Hey!")}
+                  <Box
                     sx={{
-                      position: "absolute",
-                      top: "50%",
-                      right: 0,
-                      transform: "translateY(-50%)",
+                      position: "relative",
+                      width: 20,
+                      height: 20,
+                      // backgroundColor: "lightgray",
                     }}
                   >
-                    <ListItemIcon
+                    <IconButton
+                      aria-label="delete"
+                      size="small"
                       sx={{
-                        minWidth: 0,
-                        justifyContent: "center",
+                        position: "absolute",
+                        top: "50%",
+                        right: 0,
+                        transform: "translateY(-50%)",
                       }}
                     >
-                      <Add />
-                    </ListItemIcon>
-                  </Button>
+                      <LocalHospitalIcon fontSize="inherit" />
+                    </IconButton>
+                  </Box>
                 </Box>
               ))}
             </Stack>
@@ -115,7 +122,15 @@ const DropDown = ({ isDrawerOpen, item }: DropDownProps) => {
         </CustomWidthTooltip>
       )}
       {isDrawerOpen && (
-        <ListItemButton onClick={handleDropDownClick} sx={{ px: 2.5 }}>
+        <ListItemButton
+          onClick={handleDropDownClick}
+          sx={{
+            px: 2.5,
+            "&:hover": {
+              backgroundColor: "#E6F4FF",
+            },
+          }}
+        >
           <ListItemIcon sx={{ minWidth: 0, mr: isDrawerOpen ? 1 : "auto" }}>
             <InboxIcon />
           </ListItemIcon>

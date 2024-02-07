@@ -19,7 +19,8 @@ const Card = ({ cardDetails }: CardProps) => {
       component={"div"}
       direction={"row"}
       spacing={1}
-      p={3}
+      py={3}
+      px={0}
       sx={{
         position: "relative",
         "&:not(:last-child):after": {
