@@ -8,7 +8,6 @@ type User = {
     ModulesCategoryName: string;
     SystemModuleName: string;
   }[];
-  // token: string
 };
 
 interface UserState {
@@ -19,6 +18,7 @@ interface UserState {
     ModulesCategoryName: string;
     SystemModuleName: string;
   }[];
+  isError: boolean;
 }
 
 const initialState: UserState = {
@@ -29,6 +29,7 @@ const initialState: UserState = {
   UserPriv: localStorage.getItem("UserPriv")
     ? JSON.parse(localStorage.getItem("UserPriv") ?? "")
     : [],
+  isError: false,
 };
 
 const authSlice = createSlice({
@@ -46,9 +47,16 @@ const authSlice = createSlice({
       state.UserPriv = [];
       localStorage.clear();
     },
+    setAppError: (state) => {
+      state.isError = true;
+    },
+    resetAppError: (state) => {
+      state.isError = false;
+    },
   },
 });
 
-export const { setUser, clearUser } = authSlice.actions;
+export const { setUser, clearUser, setAppError, resetAppError } =
+  authSlice.actions;
 export const userSelector = (state: RootState) => state.authReducer;
 export default authSlice.reducer;

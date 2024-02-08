@@ -12,7 +12,7 @@ export type Product = {
 };
 
 const getDashboard = async () => {
-  const res = await query.get("/UsersManagement", {
+  const res = await query.get("/UsersManagements", {
     params: { State: "Dashboard" },
   });
 

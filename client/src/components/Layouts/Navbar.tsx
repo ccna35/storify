@@ -8,6 +8,7 @@ import NotificationsPanel from "../Notifications/Notifications";
 import { Button } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { MissionsService } from "../../api/missions";
+import { useSnackbar } from "notistack";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -50,14 +51,16 @@ const Navbar = ({
     }),
   }));
 
+  const { enqueueSnackbar } = useSnackbar();
+
   const { mutateAsync: createMission } = useMutation({
     mutationFn: MissionsService.createMission,
-    // onSuccess: () => {
-    //   showSuccessMessage();
-    //   queryClient.invalidateQueries({ queryKey: ["products"] });
-    // },
+    onSuccess: (data) => {
+      enqueueSnackbar(data.msg, { variant: "success" });
+    },
     onError: (error) => {
       console.log(error);
+      enqueueSnackbar(error.response.data.msg, { variant: "error" });
     },
   });
 
@@ -87,7 +90,7 @@ const Navbar = ({
         )}
 
         <BasicBreadcrumbs />
-        <NotificationsPanel enableAnimations />
+        {/* <NotificationsPanel enableAnimations /> */}
         <Button
           variant="contained"
           color="primary"

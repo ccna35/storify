@@ -1,16 +1,39 @@
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
-import { Suspense, useEffect, useState } from "react";
-import { UserProvider } from "../../hooks/UserContext";
+import { Suspense, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { Container, Stack } from "@mui/material";
+import {
+  Backdrop,
+  Button,
+  Container,
+  Fade,
+  Modal,
+  Stack,
+  Typography,
+} from "@mui/material";
 import SpinnerOfDoom from "../Spinners/SpinnerOfDoom";
 import { useAppDispatch } from "../../store/store";
 import { clearUser } from "../../app/slices/authSlice";
 import { useIdleTimer } from "react-idle-timer";
 import SidebarMenu from "./SidebarMenu";
 import Navbar from "./Navbar";
+import { Warning } from "@mui/icons-material";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  // border: "2px solid #000",
+  boxShadow:
+    "rgba(145, 158, 171, 0.24) 0px 0px 2px 0px, rgba(145, 158, 171, 0.24) -20px 20px 40px -4px",
+  borderRadius: "10px",
+  p: 3,
+};
 
 const drawerWidth = 300;
 
@@ -61,6 +84,17 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+const FallBack = ({ error, resetErrorBoundary }: FallbackProps) => {
+  return (
+    <Stack spacing={2} py={10} alignItems={"center"}>
+      <Typography variant="h4">Something bad happened!</Typography>
+      <Button onClick={resetErrorBoundary} variant="contained">
+        Try Again
+      </Button>
+    </Stack>
+  );
+};
+
 export default function DemoLayout() {
   // Checking user activity state
   const [state, setState] = useState<"Active" | "Idle">("Active");
@@ -82,7 +116,7 @@ export default function DemoLayout() {
       const idleTime = currentTime - parseInt(lastAction);
 
       if (idleTime > timeout) {
-        handleLogOut();
+        handleOpenLogoutModal();
       } else {
         updateLastAction(currentTime);
       }
@@ -108,17 +142,12 @@ export default function DemoLayout() {
   });
 
   const handleLogOut = () => {
+    handleCloseLogoutModal();
     // clear redux state and localStorage and redirect user to login page
     dispatch(clearUser());
     localStorage.clear();
     navigate("/login");
   };
-
-  useEffect(() => {
-    if (state === "Idle") {
-      handleLogOut();
-    }
-  }, [state]);
 
   // Left Drawer logic
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
@@ -135,63 +164,106 @@ export default function DemoLayout() {
 
   const dispatch = useAppDispatch();
 
+  const [logoutModalState, setLogoutModalState] = useState(false);
+  const handleOpenLogoutModal = () => setLogoutModalState(true);
+  const handleCloseLogoutModal = () => setLogoutModalState(false);
+
   return (
-    <UserProvider>
-      <Box sx={{ display: "flex" }}>
-        {/* <CssBaseline /> */}
-        <Navbar
-          drawerWidth={drawerWidth}
-          isDrawerOpen={isDrawerOpen}
-          handleDrawerClose={handleDrawerClose}
-          handleDrawerOpen={handleDrawerOpen}
-          handleLogOut={handleLogOut}
-        />
-        <Drawer variant="permanent" open={isDrawerOpen}>
-          <DrawerHeader
-            sx={{
-              justifyContent: isDrawerOpen ? "flex-start" : "center",
-              pl: isDrawerOpen ? "20px" : "8px",
-            }}
-          >
-            <Stack direction={"row"} spacing={1}>
-              {isDrawerOpen ? (
-                <Box sx={{ width: "100%" }}>
-                  <img
-                    src="./genilogo.png"
-                    alt=""
-                    style={{ width: "100%", maxWidth: "200px" }}
-                  />
-                </Box>
-              ) : (
-                <Box sx={{ width: "40px" }}>
-                  <img
-                    src="./geniprocess-icon.png"
-                    alt=""
-                    style={{ width: "100%" }}
-                  />
-                </Box>
-              )}
-            </Stack>
-          </DrawerHeader>
-          <SidebarMenu isDrawerOpen={isDrawerOpen} />
-        </Drawer>
-        <Box
-          component="main"
+    <Box sx={{ display: "flex" }}>
+      {/* <CssBaseline /> */}
+      <Navbar
+        drawerWidth={drawerWidth}
+        isDrawerOpen={isDrawerOpen}
+        handleDrawerClose={handleDrawerClose}
+        handleDrawerOpen={handleDrawerOpen}
+        handleLogOut={handleLogOut}
+      />
+      <Drawer variant="permanent" open={isDrawerOpen}>
+        <DrawerHeader
           sx={{
-            width: "100%",
-            flexGrow: 1,
-            p: 3,
-            backgroundColor: "#FAFAFB",
+            justifyContent: isDrawerOpen ? "flex-start" : "center",
+            pl: isDrawerOpen ? "20px" : "8px",
           }}
         >
-          <DrawerHeader />
-          <Suspense fallback={<SpinnerOfDoom />}>
-            <Container maxWidth="lg">
+          <Stack direction={"row"} spacing={1}>
+            {isDrawerOpen ? (
+              <Box sx={{ width: "100%" }}>
+                <img
+                  src="./genilogo.png"
+                  alt=""
+                  style={{ width: "100%", maxWidth: "200px" }}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ width: "40px" }}>
+                <img
+                  src="./geniprocess-icon.png"
+                  alt=""
+                  style={{ width: "100%" }}
+                />
+              </Box>
+            )}
+          </Stack>
+        </DrawerHeader>
+        <SidebarMenu isDrawerOpen={isDrawerOpen} />
+      </Drawer>
+      <Box
+        component="main"
+        sx={{
+          width: "100%",
+          flexGrow: 1,
+          p: 3,
+          backgroundColor: "#FAFAFB",
+          minHeight: "100vh",
+        }}
+      >
+        <DrawerHeader />
+
+        <Suspense fallback={<SpinnerOfDoom />}>
+          <Container maxWidth="lg">
+            <ErrorBoundary
+              FallbackComponent={FallBack}
+              onError={(error, info) => {
+                console.log(error);
+                console.log(info);
+              }}
+            >
               <Outlet />
-            </Container>
-          </Suspense>
-        </Box>
+            </ErrorBoundary>
+          </Container>
+        </Suspense>
       </Box>
-    </UserProvider>
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={logoutModalState}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={logoutModalState}>
+          <Stack sx={style} spacing={3}>
+            <Stack direction={"row"} spacing={2}>
+              <Warning color="warning" sx={{ alignSelf: "center" }} />
+              <Typography id="transition-modal-description">
+                Your session has expired, you're gonna have to log in again!
+              </Typography>
+            </Stack>
+            <Button
+              onClick={handleLogOut}
+              variant="contained"
+              color="warning"
+              sx={{ alignSelf: "center", px: 4, fontSize: 16 }}
+            >
+              OK
+            </Button>
+          </Stack>
+        </Fade>
+      </Modal>
+    </Box>
   );
 }

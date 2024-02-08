@@ -5,14 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { DashboardService } from "../api/dashboard";
 import SpinnerOfDoom from "../components/Spinners/SpinnerOfDoom";
 import DemoPieChart from "../components/Pages/HomePage/PieCharts/DemoPieChart";
-import NotificationsContainer from "../components/Pages/HomePage/Notifications/NotificationContainer";
 import withHeadline from "../components/Pages/HomePage/withHeadline";
 import EmployeesInsuranceStatus from "../components/Pages/HomePage/EmployeesInsuranceStatus";
 import BarComponent from "../components/Pages/HomePage/BarComponent";
 import DemoLineChart from "../components/Pages/HomePage/Charts/DemoLineChart";
 import PendingWorkOrders from "../components/Pages/HomePage/Cards/PendingWorkOrders";
 import ExpiryNotification from "../components/Pages/HomePage/Notifications/ExpiryNotification";
-import SimpleNotification from "../components/Pages/HomePage/Notifications/SimpleNotification";
+import { useSnackbar } from "notistack";
+import { useErrorBoundary } from "react-error-boundary";
 
 const SimpleDataGridWithHeadline = withHeadline(
   SimpleDataGrid,
@@ -20,7 +20,9 @@ const SimpleDataGridWithHeadline = withHeadline(
 );
 
 const HomePage = () => {
-  // const { showBoundary } = useErrorBoundary();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { showBoundary } = useErrorBoundary();
 
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     initialData: [],
@@ -28,15 +30,10 @@ const HomePage = () => {
     queryFn: () => DashboardService.getDashboard(),
   });
 
-  // if (isError) {
-  //   showBoundary(error);
-  // }
-
-  // return (
-  //   <Typography variant="h5" component={"h1"} fontWeight={500}>
-  //     Hi, Welcome back 👋
-  //   </Typography>
-  // );
+  if (isError) {
+    showBoundary(error);
+    // enqueueSnackbar("Something went bad :(", { variant: "error" });
+  }
 
   if (isLoading || data.length === 0) {
     return <SpinnerOfDoom />;
@@ -81,8 +78,6 @@ const HomePage = () => {
     EmpDrivingLicenceExpired,
     EmpDrivingLicenceExpiredNextMonth,
   };
-
-  console.log(Object.values(expirationData).every((item) => item.length === 0));
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>

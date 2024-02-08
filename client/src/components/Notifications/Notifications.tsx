@@ -70,13 +70,13 @@ const NotificationCard = ({
 
   const { mutateAsync: updateChangeStatus } = useMutation({
     mutationFn: DashboardService.updateChangeRequestStatus,
-    onSuccess: () => {
-      enqueueSnackbar("Status updated successfully", { variant: "success" });
+    onSuccess: (data) => {
+      enqueueSnackbar(data.msg, { variant: "success" });
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
     },
     onError: (error) => {
       console.log(error);
-      enqueueSnackbar("Something went bad :(", { variant: "error" });
+      enqueueSnackbar(error.response.data.msg, { variant: "error" });
     },
   });
 

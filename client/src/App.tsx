@@ -3,17 +3,17 @@ import {
   RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
+  useNavigate,
 } from "react-router-dom";
-import RootLayout from "./layouts/RootLayout.tsx";
 import PrivateRoutes from "./layouts/PrivateRoutes.tsx";
 import { PRIVATE_ROUTES } from "./routes.tsx";
 import AuthRoutes from "./layouts/AuthRoutes.tsx";
 import SpinnerOfDoom from "./components/Spinners/SpinnerOfDoom.tsx";
 import { ErrorPage, Register } from "./pages/index.tsx";
 import Login from "./pages/Login.tsx";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { ThemeProvider } from "@emotion/react";
-import { CssBaseline } from "@mui/material";
+import { Box, Button, CssBaseline, Typography } from "@mui/material";
 import { createTheme } from "@mui/material/styles";
 import { red } from "@mui/material/colors";
 import { create } from "zustand";
